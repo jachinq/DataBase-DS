@@ -15,6 +15,8 @@ cur.execute('select Cuser,Cpswd,Cid from customer')
 s = cur.fetchall()
 
 def search():
+    cur.execute('select * from book')
+    bookinfo = cur.fetchall()
     name = raw_input('请输入书名：')
     exsit = 0
     for item in bookinfo:
@@ -28,6 +30,8 @@ def search():
         print '没有这本书'
 
 def showshopping():
+    cur.execute('exec pro_shop %d' % (cid))
+    shopping = cur.fetchall()
     if shopping:
         print '编号  ISBN\t\t  书名\t\t\t\t\t\t 单价\t\t数量\t  总价 '
         for item, num in zip(shopping, range(len(shopping))):
@@ -41,6 +45,8 @@ def showshopping():
         print ('你的购物车为空')
 
 def addToShopping():
+    cur.execute('exec pro_shop %d' % (cid))
+    shopping = cur.fetchall()
     name = raw_input('请输入书名：')
     exsit = 0
     for item in bookinfo:
@@ -54,9 +60,17 @@ def addToShopping():
             if c_ques == 'y' or c_ques == 'Y':
                 hmuch = int(raw_input('要加入多少本?'))
                 if hmuch > 0:
-                    cur.execute('insert into shopping values(%s,%s,%d,%.2f)'
+                    try:
+                        cur.execute('insert into shopping values(%s,%s,%d,%.2f)'
                                 % (cid, item[0], hmuch, hmuch * float(item[3].strip('元'))))
-                    conn.commit()
+                        conn.commit()
+                    except:
+                        cur.execute('select Ocount,price from shopping where cid = %d and ISBN = %s'
+                                         %(cid,item[0]))
+                        sh = cur.fetchall()
+                        cur.execute('update shopping set ocount = %d,price = %.2f where cid = %d and isbn = %s'
+                                    % (hmuch+sh[0][0], sh[0][1]+hmuch * float(item[3].strip('元')),cid, item[0]))
+                        conn.commit()
             else:
                 pass
     if not exsit:
@@ -94,6 +108,9 @@ def changeinfo():
 
 def custom():
 
+
+
+
     flag = True
     print '欢迎使用网上书店系统'
     while(flag):
@@ -106,6 +123,8 @@ def custom():
         print '7.退出'
         i = int(raw_input('输入你的选择：'))
         if i == 1:
+            cur.execute('select * from book')
+            bookinfo = cur.fetchall()
             for item in bookinfo:
                 print '─'*38
                 print '书名  %-14s |作者  %-8s |价格  %-4s'%(item[1],item[2],item[3])
@@ -135,7 +154,6 @@ pswd = raw_input('密码：')
 for item in s:
     if user == item[0] and pswd == item[1]:
         print '登录成功'
-
         cur.execute('select * from book')
         bookinfo = cur.fetchall()
 
