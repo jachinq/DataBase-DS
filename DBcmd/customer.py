@@ -22,7 +22,7 @@ def search():
     for item in bookinfo:
         if item[1].encode('utf-8') == name:
             exsit = 1
-            print 'ISBN %s\n书名\t%s\n作者\t%s\n价格\t%s\n出版社\t%s\n库存\t%s' \
+            print 'ISBN：%s\n书名：\t%s\n作者：\t%s\n价格：\t%s\n出版社：\t%s\n库存：\t%s' \
                   % (item[0], item[1], item[2], item[3], item[4], item[7])
             print '简介', item[5]
             print
@@ -33,11 +33,12 @@ def showshopping():
     cur.execute('exec pro_shop %d' % (cid))
     shopping = cur.fetchall()
     if shopping:
-        print '编号  ISBN\t\t  书名\t\t\t\t\t\t 单价\t\t数量\t  总价 '
+        print '编号\t\tISBN\t\t书名\t\t\t\t\t  单价\t   数量\t\t总价 '
         for item, num in zip(shopping, range(len(shopping))):
-            tab = '%-3d %s %-' + str((32 - len(item[3])) / 3 + len(item[3])) + 's %s   %d     %d'
+            tab = ' %-2d\t%s\t%s %s\t\t%d\t\t%d'
             print '─' * 38
-            print tab % (num, item[2], item[3], item[4], item[5], item[6])
+            length = 20 - len(item[3])*2 + len(item[3])
+            print tab % (num, item[2].ljust(13), item[3].ljust(length), item[4], item[5], item[6])
         c_ques = raw_input('要下单吗(y/n)?')
         if c_ques == 'y' or c_ques == 'Y':
             pass
@@ -52,7 +53,7 @@ def addToShopping():
     for item in bookinfo:
         if item[1].encode('utf-8') == name:
             exsit = 1
-            print 'ISBN %s\n书名\t%s\n作者\t%s\n价格\t%s\n出版社\t%s\n库存\t%s' \
+            print 'ISBN：%s\n书名：\t%s\n作者：\t%s\n价格：\t%s\n出版社：\t%s\n库存：\t%s' \
                   % (item[0], item[1], item[2], item[3], item[4], item[7])
             print '=' * 18 + '\n简介', item[5]
             print '=' * 18
@@ -107,27 +108,24 @@ def changeinfo():
 
 
 def custom():
-
-
-
-
-    flag = True
     print '欢迎使用网上书店系统'
-    while(flag):
+    while True:
         print '\n1.书籍概览'
         print '2.查找书籍'
         print '3.购书'
         print '4.查看购物车'
         print '5.查看订单'
         print '6.修改个人信息'
-        print '7.退出'
+        print '0.退出'
         i = int(raw_input('输入你的选择：'))
         if i == 1:
             cur.execute('select * from book')
             bookinfo = cur.fetchall()
             for item in bookinfo:
                 print '─'*38
-                print '书名  %-14s |作者  %-8s |价格  %-4s'%(item[1],item[2],item[3])
+                length1 = 30 - len(item[1]) * 2 + len(item[1])
+                length2 = 30 - len(item[2]) * 2 + len(item[2])
+                print '%s %s %-4s'%(item[1].ljust(length1),item[2].ljust(length2),item[3])
             c_ques = raw_input('是否要查看某本书的详细信息(y/n)?')
             if c_ques == 'y' or c_ques == 'Y':
                 search()
@@ -146,8 +144,8 @@ def custom():
         elif i == 6:
             changeinfo()
             raw_input('回车以继续。')
-        elif i == 7:
-            flag = False
+        elif i == 0:
+            break
 
 user = raw_input('账号：')
 pswd = raw_input('密码：')
