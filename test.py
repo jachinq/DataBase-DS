@@ -74,17 +74,24 @@ class User(Frame):
         pass
 
         style = Style()
+        style.configure('TSeparator', background='#000000')
+        style.configure('TLabel', anchor='w', font=(u'幼圆', 14),background = 'white'
+                        ,relief = 'flat')
 
         FrameSearch =  tk.LabelFrame(top,text = '搜索',background = 'white')
-        FrameSearch.place(relx = 0,rely = 0.22,relheight = 0.78,relwidth = 1,)
+        FrameSearch.place(relx = 0,rely = 0.22,relwidth = 1,relheight = 0.78,)
 
-        textSearch = tk.Text(FrameSearch, font=(u'宋体', 18), relief='solid')#sunken,solid,raised,ridge,flat,groove
-        textSearch.place(relx = 0.05,rely = 0.05,relheight = 0.1,relwidth = 0.5)
+        labelSearchBName = Label(FrameSearch,text = '书名')
+        labelSearchBName.place(relx = 0.05,rely = 0.05,relwidth = 0.2,relheight = 0.1)
 
+        textSearch = tk.Text(FrameSearch, font=(u'幼圆', 18), relief='solid')#sunken,solid,raised,ridge,flat,groove
+        textSearch.place(relx = 0.17,rely = 0.05,relwidth = 0.6,relheight = 0.1)
 
-        style.configure('TSeparator', background='#000000')
+        buttonSearch = tk.Button(FrameSearch, text='Search', command=self.event_addToShop, relief = 'groove')
+        buttonSearch.place(relx = 0.8,rely = 0.05, relwidth=0.11, relheight=0.1)
+
         Line1 = Separator(FrameSearch, orient='horizontal', style='Line1.TSeparator')
-        Line1.place(relx=0., rely=0.196, relwidth=1.00, relheight=0.002)
+        Line1.place(relx=0., rely=0.23, relwidth=1.00, relheight=0.002)
 
     def User(self):
         #TODO 账户
@@ -102,7 +109,7 @@ class Application(User):
         #TODO 书籍页面
         pass
         self.Page()
-
+    
     def event_search(self, event=None):
         #TODO 搜索
         pass
@@ -122,6 +129,11 @@ class Application(User):
         #TODO 用户个人界面
         pass
         self.User()
+
+    def event_addToShop(self):
+        #TODO 添加至购物车
+        pass
+        print '添加成功'
 
 top = tk.Tk()
 Application(top)
