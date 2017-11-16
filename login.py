@@ -7,6 +7,7 @@ import Tkinter as tk
 from ttk import *
 import tkinter.messagebox
 
+
 d = {}
 class Application_ui(Frame):
     #这个类仅实现界面生成功能，具体事件处理代码在子类Application中。
@@ -19,6 +20,8 @@ class Application_ui(Frame):
         self.master.resizable(0,0)
         self.create_Background()
         self.create_login()
+
+        self.master.mainloop()
 
     def create_Background(self):
         self.picture = tk.Canvas(self.master,bg = 'gray')
@@ -120,10 +123,14 @@ class Application(Application_ui):
                 top.destroy()
             except:
                 pass
-            main.main()
+            import User
         else:
             tkinter.messagebox.showerror('错误', '账户名或密码错误')
 
 if __name__ == "__main__":
     top = tk.Tk()
-    Application(top).mainloop()
+    Application(top)
+
+
+##########################################
+##########################################
