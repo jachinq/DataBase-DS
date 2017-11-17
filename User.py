@@ -187,7 +187,7 @@ class User(Frame):
         cur.execute(comm)
         self.BookDetInfo = cur.fetchall()
         self.bookValues=['a','b','c','d','e','f','g']
-        Text_list = ['Text_name' + str(i) for i in range(7)]
+        self.Text_list = ['Text_name' + str(i) for i in range(7)]
         Lab_list = ['lab_name' + str(i) for i in range(7)]
         Lab_name = ['书名','作者','价格','出版社','ISBN','简介','库存']
 
@@ -197,19 +197,19 @@ class User(Frame):
             self.bookValues[i] = self.BookDetInfo[0][i]
 
         #文本框，标签和分割线
-            Text_list[i] = tk.Text(self.FrameDet
+            self.Text_list[i] = tk.Text(self.FrameDet
                  ,font = (14),relief = 'solid')
             Lab_list[i] = Label(self.FrameDet, text=Lab_name[i], style='bookDet.TLabel')
-            Text_list[i].insert('insert',self.bookValues[i])
-            Text_list[i].configure(state = 'disable')
+            self.Text_list[i].insert('insert',self.bookValues[i])
+            self.Text_list[i].configure(state = 'disable')
 
-        Text_list[6].place(relx=0.18, rely=0.88, relwidth=0.18, relheight=0.06)
-        Text_list[5].place(relx=0.18, rely=0.5, relwidth=0.7, relheight=0.35)
-        Text_list[4].place(relx=0.55, rely=0.42, relwidth=0.33, relheight=0.06)
-        Text_list[3].place(relx=0.18, rely=0.33, relwidth=0.7, relheight=0.06)
-        Text_list[2].place(relx=0.18, rely=0.42, relwidth=0.25, relheight=0.06)
-        Text_list[1].place(relx=0.18, rely=0.24, relwidth=0.7, relheight=0.06)
-        Text_list[0].place(relx=0.37, rely=0.082, relwidth=0.5, relheight=0.06)
+        self.Text_list[6].place(relx=0.18, rely=0.88, relwidth=0.18, relheight=0.06)
+        self.Text_list[5].place(relx=0.18, rely=0.5, relwidth=0.7, relheight=0.35)
+        self.Text_list[4].place(relx=0.55, rely=0.42, relwidth=0.33, relheight=0.06)
+        self.Text_list[3].place(relx=0.18, rely=0.33, relwidth=0.7, relheight=0.06)
+        self.Text_list[2].place(relx=0.18, rely=0.42, relwidth=0.25, relheight=0.06)
+        self.Text_list[1].place(relx=0.18, rely=0.24, relwidth=0.7, relheight=0.06)
+        self.Text_list[0].place(relx=0.37, rely=0.082, relwidth=0.5, relheight=0.06)
 
         Lab_list[6].place(relx=0.07, rely=0.88, relwidth=0.1, relheight=0.06)
         Lab_list[5].place(relx=0.07, rely=0.5, relwidth=0.1, relheight=0.06)
@@ -225,8 +225,8 @@ class User(Frame):
 
         S = Scrollbar(self.FrameDet)
         S.pack(side=tk.RIGHT, fill=tk.Y)
-        S.config(command=Text_list[5].yview)
-        Text_list[5].config(yscrollcommand=S.set)
+        S.config(command=self.Text_list[5].yview)
+        self.Text_list[5].config(yscrollcommand=S.set)
 
     def Shopping(self):
         #TODO 购物车
@@ -239,9 +239,9 @@ class User(Frame):
                                        columns=('c1', 'c2','c3','c4'),
                                        show="headings")
         self.libox_ShopInfo.column('c1', width=80, anchor='center')
-        self.libox_ShopInfo.column('c2', width=80, anchor='center')
-        self.libox_ShopInfo.column('c3', width=80, anchor='center')
-        self.libox_ShopInfo.column('c4', width=80, anchor='center')
+        self.libox_ShopInfo.column('c2', width=40, anchor='center')
+        self.libox_ShopInfo.column('c3', width=10, anchor='center')
+        self.libox_ShopInfo.column('c4', width=40, anchor='center')
 
         # 设置每列表头标题文本
         self.libox_ShopInfo.heading('c1', text='书名')
@@ -259,11 +259,15 @@ class User(Frame):
         ysb.pack(side=tk.RIGHT, fill=tk.Y)
         xsb.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.btnSettlement = tk.Button(self.FrameShopping, text='结算', command=self.event_addToOrder, relief='groove')
-        self.btnSettlement.place(relx=0.7, rely=0.8, relwidth=0.11, relheight=0.07)
-
-        self.btnEditShop = tk.Button(self.FrameShopping, text='编辑', command=self.event_addToOrder, relief='groove')
-        self.btnEditShop.place(relx=0.5, rely=0.8, relwidth=0.11, relheight=0.07)
+        self.btnSettlement = tk.Button(self.FrameShopping, text='结算', command=self.event_addToOrder
+                                       , relief='groove',font = (u'幼圆',14))
+        self.btnEditShop = tk.Button(self.FrameShopping, text='编辑数量', command=self.event_addToOrder
+                                     , relief='groove',font = (u'幼圆',14))
+        self.btnDelShop = tk.Button(self.FrameShopping, text='移出购物车', command=self.event_addToOrder
+                                    , relief='groove',font = (u'幼圆',14))
+        self.btnDelShop.place(relx=0.3, rely=0.83, relwidth=0.18, relheight=0.07)
+        self.btnEditShop.place(relx=0.52, rely=0.83, relwidth=0.15, relheight=0.07)
+        self.btnSettlement.place(relx=0.7, rely=0.83, relwidth=0.11, relheight=0.07)
 
     def Order(self):
         #TODO 订单
@@ -383,6 +387,7 @@ class Application(User):
         self.style = Style()
         #设置列表的标题风格
         self.style.configure("Treeview.Heading", foreground='blue')
+        self.style.configure("Treeview", font=12)
 
         self.cur = conn.cursor()
         self.cur.execute('select ISBN,Bname from book')
@@ -408,10 +413,19 @@ class Application(User):
         self.Search()
 
     def b_shopping(self, event=None):
+        '''
+        查看购物车信息，可以结算，可以编辑购物车，包括修改已有书籍数量，和删除已有的购物项
+        :param event: 
+        :return: 
+        '''
         #TODO 购物车页面
         pass
         self.Shopping()
-
+        cur.execute("exec pro_shop %d"%self.Cid)
+        self.ShopInfo = cur.fetchall()
+        for i in range(len(self.ShopInfo)):
+            self.libox_ShopInfo.insert('', i, v=[self.ShopInfo[i][3], self.ShopInfo[i][4]
+                ,self.ShopInfo[i][5], self.ShopInfo[i][6]])
 
     def b_order(self, event=None):
         #TODO 订单界面
@@ -424,11 +438,30 @@ class Application(User):
         self.User()
 
     def event_addToShop(self):
-        #TODO 添加至购物车功能
+        '''添加至购物车功能,每次默认添加一本，修改数量要使用购物车页面的编辑数量功能
+        '''
         pass
-        print '添加成功'
+        ISBN = str(self.Text_list[4].get("1.0","12.0"))
+        price = float(self.Text_list[2].get("1.0","16.0")[0:-2])
+        Ocount = 1
+        comm = '''exec pro_addtoshop %d,'%s',%d,%f''' % (self.Cid, ISBN, Ocount, price)
+        cur.execute(comm)
+        try:
+            s = cur.fetchall()
+            price = s[0][1] / s[0][0] * (Ocount + s[0][0])
+            cur.execute('update shopping set ocount = %d,price = %.2f where cid = %d and isbn = %s' % (
+                Ocount + s[0][0], price, self.Cid, ISBN))
+            conn.commit()
+            print '追加成功'
+        except:
+            conn.commit()
+            print '添加成功'
 
     def SearchToDet(self):
+        '''
+        从搜索结果打开书籍详情页
+        :return: 
+        '''
         list_box_bookname = self.libox_bookInfo.item(self.libox_bookInfo.focus(), "values")[0]
         for i in self.BookInfo:
             if list_box_bookname == i[1]:
@@ -437,6 +470,10 @@ class Application(User):
         self.Det()
 
     def event_search(self):
+        '''
+        完成搜索功能，支持模糊搜索，把搜索结果添加到treeview中
+        :return: 
+        '''
         #TODO 搜索功能
         #print self.BookInfo
         cur.execute('select ISBN,Bname,Bauth from book')
