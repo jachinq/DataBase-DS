@@ -238,7 +238,7 @@ class User(Frame):
         self.libox_ShopInfo = Treeview(self.FrameShopping,
                                        columns=('c1', 'c2','c3','c4'),
                                        show="headings")
-        self.libox_ShopInfo.column('c1', width=80, anchor='center')
+        self.libox_ShopInfo.column('c1', width=200, anchor='center')
         self.libox_ShopInfo.column('c2', width=40, anchor='center')
         self.libox_ShopInfo.column('c3', width=10, anchor='center')
         self.libox_ShopInfo.column('c4', width=40, anchor='center')
@@ -357,28 +357,28 @@ class User(Frame):
         style.configure('user.TLabel', anchor='w', font=(u'幼圆', 14), background='white'
                         , relief='flat',foreground = '#4141CF')
         self.FrameUser =  tk.LabelFrame(top,text = '用户',background = '#fff')
-        self.FrameUser.place(relx = 0.22,rely = 0,relheight = 1,relwidth = 0.78)
+        self.FrameUser.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.87)
 
         for i in range(7):
             self.labelname[i] = Label(self.FrameUser, text=self.labelshowname[i], style='user.TLabel')
-            self.entryname[i] = tk.Entry(self.FrameUser, textvariable=self.userValues[i], state='normal'
+            self.entryname[i] = tk.Entry(self.FrameUser, textvariable=self.userValues[i], state='readonly'
                                  , font=(u'宋体', 18), relief='solid',bg = '#fff')
 
-        self.labelname[0].place(relx=0.05, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.labelname[1].place(relx=0.55, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.labelname[2].place(relx=0.05, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.labelname[3].place(relx=0.55, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.labelname[4].place(relx=0.05, rely=0.35, relwidth=0.148, relheight=0.08)
-        self.labelname[5].place(relx=0.05, rely=0.50, relwidth=0.148, relheight=0.08)
-        self.labelname[6].place(relx=0.05, rely=0.65, relwidth=0.148, relheight=0.08)
+        self.labelname[0].place(relx=0.18, rely=0.05, relwidth=0.148, relheight=0.08)
+        self.labelname[1].place(relx=0.48, rely=0.05, relwidth=0.148, relheight=0.08)
+        self.labelname[2].place(relx=0.18, rely=0.20, relwidth=0.148, relheight=0.08)
+        self.labelname[3].place(relx=0.48, rely=0.20, relwidth=0.148, relheight=0.08)
+        self.labelname[4].place(relx=0.18, rely=0.35, relwidth=0.148, relheight=0.08)
+        self.labelname[5].place(relx=0.18, rely=0.50, relwidth=0.148, relheight=0.08)
+        self.labelname[6].place(relx=0.18, rely=0.65, relwidth=0.148, relheight=0.08)
 
         self.entryname[0].place(relx=0.25, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.entryname[1].place(relx=0.65, rely=0.05, relwidth=0.148, relheight=0.08)
+        self.entryname[1].place(relx=0.55, rely=0.05, relwidth=0.148, relheight=0.08)
         self.entryname[2].place(relx=0.25, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.entryname[3].place(relx=0.65, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.entryname[4].place(relx=0.25, rely=0.35, relwidth=0.6, relheight=0.08)
-        self.entryname[5].place(relx=0.25, rely=0.50, relwidth=0.6, relheight=0.08)
-        self.entryname[6].place(relx=0.25, rely=0.65, relwidth=0.6, relheight=0.08)
+        self.entryname[3].place(relx=0.55, rely=0.20, relwidth=0.148, relheight=0.08)
+        self.entryname[4].place(relx=0.25, rely=0.35, relwidth=0.45, relheight=0.08)
+        self.entryname[5].place(relx=0.25, rely=0.50, relwidth=0.45, relheight=0.08)
+        self.entryname[6].place(relx=0.25, rely=0.65, relwidth=0.45, relheight=0.08)
 
 
 class Application(User):
