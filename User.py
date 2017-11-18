@@ -7,6 +7,8 @@ Data: 2317- 11-
 import tkinter as tk
 from tkinter.ttk import *
 from PIL import Image,ImageTk
+from tkinter.messagebox import *
+import re
 import pymssql
 
 class User(Frame):
@@ -340,46 +342,54 @@ class User(Frame):
     def User(self):
         #TODO 账户
         pass
+        style = Style()
+        style.configure('user.TLabel', anchor='w', font=(u'幼圆', 14), background='white'
+                        , relief='flat', foreground='#4141CF')
+
         cur.execute('exec pro_getUserInfo %d' % self.Cid)
         self.userInfo = cur.fetchall()
         self.userValues = ['userValues' + str(i) for i in range(9)]
         self.labelname = ['labelUserName', 'labelUserSex','labelUserReal', 'labelUserPost'
             ,  'labelUserEmail', 'labelUserPhone','labelUserAddress']
-        self.labelshowname = ['昵称','性别','真实姓名','邮编','邮箱','联系方式','地址']
+        self.labelshowname = ['账户','性别','姓名','邮编','邮箱','手机','地址']
         self.entryname = ['entryUserName', 'entryUserSex', 'entryUserReal', 'entryUserPost'
             , 'entryUserEmail', 'entryUserPhone', 'entryUserAddress']
 
-        for i in range(9):
+        for i in range(7):
             self.userValues[i] = tk.StringVar()
             self.userValues[i].set(self.userInfo[0][i])
 
-        style = Style()
-        style.configure('user.TLabel', anchor='w', font=(u'幼圆', 14), background='white'
-                        , relief='flat',foreground = '#4141CF')
         self.FrameUser =  tk.LabelFrame(top,text = '用户',background = '#fff')
         self.FrameUser.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.87)
-
+        self.userValue = ['userInfo'+str(i) for i in range(7)]
         for i in range(7):
             self.labelname[i] = Label(self.FrameUser, text=self.labelshowname[i], style='user.TLabel')
-            self.entryname[i] = tk.Entry(self.FrameUser, textvariable=self.userValues[i], state='readonly'
-                                 , font=(u'宋体', 18), relief='solid',bg = '#fff')
+            self.entryname[i] = tk.Entry(self.FrameUser,state = 'readonly',textvariable = self.userValues[i]
+                                 , font=(u'宋体', 18), relief='solid',fg = 'black')
 
-        self.labelname[0].place(relx=0.18, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.labelname[1].place(relx=0.48, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.labelname[2].place(relx=0.18, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.labelname[3].place(relx=0.48, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.labelname[4].place(relx=0.18, rely=0.35, relwidth=0.148, relheight=0.08)
-        self.labelname[5].place(relx=0.18, rely=0.50, relwidth=0.148, relheight=0.08)
-        self.labelname[6].place(relx=0.18, rely=0.65, relwidth=0.148, relheight=0.08)
+        self.labelname[0].place(relx=0.2, rely=0.05, relwidth=0.148, relheight=0.08)
+        self.labelname[1].place(relx=0.5, rely=0.05, relwidth=0.148, relheight=0.08)
+        self.labelname[2].place(relx=0.2, rely=0.20, relwidth=0.148, relheight=0.08)
+        self.labelname[3].place(relx=0.5, rely=0.20, relwidth=0.148, relheight=0.08)
+        self.labelname[4].place(relx=0.2, rely=0.35, relwidth=0.148, relheight=0.08)
+        self.labelname[5].place(relx=0.2, rely=0.50, relwidth=0.148, relheight=0.08)
+        self.labelname[6].place(relx=0.2, rely=0.65, relwidth=0.148, relheight=0.08)
 
-        self.entryname[0].place(relx=0.25, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.entryname[1].place(relx=0.55, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.entryname[2].place(relx=0.25, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.entryname[3].place(relx=0.55, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.entryname[4].place(relx=0.25, rely=0.35, relwidth=0.45, relheight=0.08)
-        self.entryname[5].place(relx=0.25, rely=0.50, relwidth=0.45, relheight=0.08)
-        self.entryname[6].place(relx=0.25, rely=0.65, relwidth=0.45, relheight=0.08)
+        self.entryname[0].place(relx=0.27, rely=0.05, relwidth=0.148, relheight=0.08)
+        self.entryname[1].place(relx=0.57, rely=0.05, relwidth=0.148, relheight=0.08)
+        self.entryname[2].place(relx=0.27, rely=0.20, relwidth=0.148, relheight=0.08)
+        self.entryname[3].place(relx=0.57, rely=0.20, relwidth=0.148, relheight=0.08)
+        self.entryname[4].place(relx=0.27, rely=0.35, relwidth=0.45, relheight=0.08)
+        self.entryname[5].place(relx=0.27, rely=0.50, relwidth=0.45, relheight=0.08)
+        self.entryname[6].place(relx=0.27, rely=0.65, relwidth=0.45, relheight=0.16)
 
+
+        self.btnEditPswd = tk.Button(self.FrameUser, text='修改密码', command=self.event_addToOrder
+                                       , relief='groove',font = (u'幼圆',14))
+        self.btnEditUserInfo = tk.Button(self.FrameUser, text='编辑信息', command=self.event_editUserInfo
+                                     , relief='groove',font = (u'幼圆',14))
+        self.btnEditPswd.place(relx=0.32, rely=0.85, relwidth=0.15, relheight=0.07)
+        self.btnEditUserInfo.place(relx=0.52, rely=0.85, relwidth=0.15, relheight=0.07)
 
 class Application(User):
     #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
@@ -492,8 +502,74 @@ class Application(User):
         #TODO 把购物车的书籍清空，生成相应的的订单
         pass
 
+    def event_editUserInfo(self):
+        #TODO 编辑用户信息，将文本框设置为普通模式，
+        print self.userInfo
+        for i in range(7):
+            #self.entryname[i].insert('insert',self.userValues[i])
+            self.entryname[i].configure(state = 'normal')
+        self.btnEditUserInfo.configure(text = '确认',command = self.event_confirm)
+
+    def event_confirm(self):
+        #TODO 确认用户修改信息,将模式设置为不可用
+        # ，读取文本框的数据，写回数据库，并提示完成修改
+        for i in range(7):
+            self.userValues[i] = self.entryname[i].get()
+        self.justy_userInfo()
+        if self.userInfoFlag:
+            for i in range(7):
+                self.entryname[i].configure(state='readonly')
+
+            self.btnEditUserInfo.configure(text = '编辑信息',command = self.event_editUserInfo)
+            comm = "update customer set Cuser='%s',Csex='%s',Creal='%s',Cpost=%d,Cemail='%s',Cnumber='%s',Caddress='%s' where cid = %d"%(
+                self.userValues[0],self.userValues[1],self.userValues[2],int(self.userValues[3])
+                     ,self.userValues[4],self.userValues[5],self.userValues[6]
+                ,self.Cid)
+            comm = str(comm.encode('utf-8'))
+            cur.execute(comm)
+            conn.commit()
+            #print comm
+            showinfo('提示', '修改成功')
+
+
+    def justy_userInfo(self):
+        '''
+        判断用户填写信息是否正确
+        :return: 
+        '''
+        self.userInfoFlag = True
+        if not self.userValues[0].isalnum():
+            showerror('错误', '账号只能由字母和数字组成')
+            self.userInfoFlag = False
+
+        if self.userValues[1] not in [u'男',u'女']:
+            showerror('错误', '性别只能为\'男\'或\'女\'')
+            self.userInfoFlag = False
+
+        if '' == self.userValues[2]:
+            showerror('错误', '姓名不能为空')
+            self.userInfoFlag = False
+
+        if not self.userValues[3].isdigit() or len(self.userValues[3]) != 6:
+            showerror('错误', '邮编格式错误')
+            self.userInfoFlag = False
+
+        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$"
+                , self.userValues[4]) == None:
+            showerror('错误', 'Email格式错误')
+            self.userInfoFlag = False
+
+        if not self.userValues[5].isdigit() or len(self.userValues[5]) != 11:
+            showerror('错误', '手机号格式错误')
+            self.userInfoFlag = False
+
+        if '' == self.userValues[6]:
+            showerror('错误', '地址不能为空')
+            self.userInfoFlag = False
+
 conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
                            , database='BookStore', charset="utf8")
+
 cur = conn.cursor()
 top = tk.Tk()
 Application(top)
