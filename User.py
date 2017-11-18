@@ -9,7 +9,9 @@ from tkinter.ttk import *
 from PIL import Image,ImageTk
 from tkinter.messagebox import *
 import re
+import time
 import pymssql
+
 
 class User(Frame):
     def __init__(self,top = None):
@@ -590,6 +592,7 @@ class Application(User):
 
         cur.execute("select distinct Oid from orderinfo where cid = %d" % self.Cid)
         self.OrderInfo = cur.fetchall()
+        #TODO self.OrderInfo两个订单以上时，改数据
         if self.OrderInfo:
             comm = "select Bname,Ocount,price from orderinfo where cid = %d and Oid = '%s'" \
                    % (self.Cid, str(self.OrderInfo[0][0]))
@@ -686,15 +689,59 @@ class Application(User):
                 if self.textSearch.get("1.0") in self.BookInfo[i][2]:
                     self.libox_bookInfo.insert('', i, v=[self.BookInfo[i][1], self.BookInfo[i][2]])
 
+    def generate_orderInfo(self,Rid):
+        '''生成相应插入订单表的命令。返回一个列表'''
+        comms = []
+        t = str(time.time())[0:-3]
+        Oid = t[3:7] + time.strftime("%Y%m%d%H", time.localtime())[1:-2] + str(self.Cid) + t[7:10]
+        date = time.strftime("%Y-%m-%d", time.localtime())
+        for i in self.order_shopInfo:
+            print i[0].encode('utf-8')
+            print type(i[0].encode('utf-8'))
+            cur.execute("select Bname from book where ISBN = '%s'"%(i[0].encode('utf-8')))
+            Bname = cur.fetchall()
+            Bname = Bname[0][0]
+            comm = "insert into orderinfo values('%s',%d,%d,'%s','%s','%s',%d,%.2f)"%(Oid,self.Cid,Rid,date,Bname
+                                                                        ,str(i[0].encode('utf-8')),int(i[1]),float(i[2]))
+            comm = comm.encode('utf-8')
+            comms.append(comm)
+        return comms
+
     def event_addToOrder(self):
         #TODO 把购物车的书籍清空，生成相应的的订单
         pass
-        cur.execute('select * from shopping where Cid = %d'%self.Cid)
-        shopInfo = cur.fetchall()
-        if shopInfo:
-            print shopInfo
-        else:
-            showerror('错误','你的购物车为空')
+        if 'yes' == askquestion('移除', '真的要移出购物车吗?'):
+            cur.execute('select ISBN,Ocount,price from shopping where Cid = %d'%self.Cid)
+            self.order_shopInfo = cur.fetchall()
+            if self.order_shopInfo:
+                #如果购物车非空，则读取当前用户信息的姓名，手机，地址，邮编
+                #读取cid与当前用户一致的收货人信息，一一比较
+                cur.execute("select Creal,Cnumber,Caddress,Cpost from customer where Cid = %d"%self.Cid)
+                current_UserInfo = cur.fetchall()#获取用户当前信息
+                cur.execute("select Rname,Rnum,Raddress,Rpost from receve where Cid = %d"%self.Cid)
+                ReceveInfo = cur.fetchall()#获取用户已有收货地址
+                if current_UserInfo[0] in ReceveInfo:#判断当前信息是否在收货地址中
+                    comm = "select Rid from receve where Cid = %d and Rname = '%s' and Rnum = '%s' and " \
+                           "Raddress = '%s' and Rpost = %d"%(self.Cid,str(current_UserInfo[0][0].encode('utf-8')),str(current_UserInfo[0][1].encode('utf-8'))
+                                                                ,str(current_UserInfo[0][2].encode('utf-8')),current_UserInfo[0][3])
+                    cur.execute(comm)
+                    Rid = cur.fetchall()
+                    for i in self.generate_orderInfo(Rid[0][0]):
+                        cur.execute(i)      #插入订单表，这里没有判断库存的问题
+                    conn.commit()
+                else:
+                    #如果当前用户信息不在收货人列表，则生成新的收货人
+                    Rid = len(ReceveInfo)+1
+                    comm = "insert into receve values (%d,%d,'%s','%s','%s',%d)" %(Rid,self.Cid, str(current_UserInfo[0][0].encode('utf-8')),
+                                                               str(current_UserInfo[0][1].encode('utf-8'))
+                                                               , str(current_UserInfo[0][2].encode('utf-8')),
+                                                               current_UserInfo[0][3])
+
+                    for i in self.generate_orderInfo(Rid):
+                        cur.execute(i)      #插入订单表，这里没有判断库存的问题
+                    conn.commit()
+            else:
+                showerror('错误','你的购物车为空')
 
     def event_editUserInfo(self):
         '''
