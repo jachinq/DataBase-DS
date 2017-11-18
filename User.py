@@ -38,9 +38,9 @@ class User(Frame):
         self.b_search = tk.Button(self.FrameMenu,image = self.ico_search,command = self.b_search
                              , relief='groove')
         self.b_search.grid(column=1,row = 1)
-        self.b_shopping = tk.Button(self.FrameMenu,image = self.ico_shopping,command = self.b_shopping
+        self.b_shop = tk.Button(self.FrameMenu,image = self.ico_shopping,command = self.b_shopping
                                ,relief = 'groove')
-        self.b_shopping.grid(column=1,row = 2)
+        self.b_shop.grid(column=1,row = 2)
         self.b_order = tk.Button(self.FrameMenu,image = self.ico_order,command = self.b_order
                             , relief='groove')
         self.b_order.grid(column=1,row = 3)
@@ -263,19 +263,60 @@ class User(Frame):
 
         self.btnSettlement = tk.Button(self.FrameShopping, text='结算', command=self.event_addToOrder
                                        , relief='groove',font = (u'幼圆',14))
-        self.btnEditShop = tk.Button(self.FrameShopping, text='编辑数量', command=self.event_addToOrder
+        self.btnEditShop = tk.Button(self.FrameShopping, text='编辑数量', command=self.event_editOcount
                                      , relief='groove',font = (u'幼圆',14))
-        self.btnDelShop = tk.Button(self.FrameShopping, text='移出购物车', command=self.event_addToOrder
+        self.btnDelShop = tk.Button(self.FrameShopping, text='移出购物车', command=self.event_removeFromShop
                                     , relief='groove',font = (u'幼圆',14))
-        self.btnDelShop.place(relx=0.3, rely=0.83, relwidth=0.18, relheight=0.07)
-        self.btnEditShop.place(relx=0.52, rely=0.83, relwidth=0.15, relheight=0.07)
-        self.btnSettlement.place(relx=0.7, rely=0.83, relwidth=0.11, relheight=0.07)
+        self.btnFlash = tk.Button(self.FrameShopping, text='刷新', command=self.b_shopping
+                                    , relief='groove',font = (u'幼圆',14))
+        self.btnDelShop.place(relx=0.31, rely=0.83, relwidth=0.18, relheight=0.07)
+        self.btnEditShop.place(relx=0.51, rely=0.83, relwidth=0.15, relheight=0.07)
+        self.btnSettlement.place(relx=0.76, rely=0.83, relwidth=0.11, relheight=0.07)
+        self.btnFlash.place(relx=0.1, rely=0.83, relwidth=0.11, relheight=0.07)
 
     def Order(self):
         #TODO 订单
         pass
         self.FrameOrder =  tk.LabelFrame(top,text = '订单',background = 'white')
-        self.FrameOrder.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.78,)
+        self.FrameOrder.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.87,)
+
+        # Treeview组件，6列，显示表头，带垂直滚动条
+        self.libox_ShopInfo = Treeview(self.FrameOrder,
+                                       columns=('c1', 'c2', 'c3', 'c4'),
+                                       show="headings")
+        self.libox_ShopInfo.column('c1', width=200, anchor='center')
+        self.libox_ShopInfo.column('c2', width=40, anchor='center')
+        self.libox_ShopInfo.column('c3', width=10, anchor='center')
+        self.libox_ShopInfo.column('c4', width=40, anchor='center')
+
+        # 设置每列表头标题文本
+        self.libox_ShopInfo.heading('c1', text='书名')
+        self.libox_ShopInfo.heading('c2', text='单价')
+        self.libox_ShopInfo.heading('c3', text='数量')
+        self.libox_ShopInfo.heading('c4', text='总价')
+
+        self.libox_ShopInfo.place(relx=0.1, rely=0.08, relwidth=0.77, relheight=0.7)
+        # 滚动条
+        ysb = Scrollbar(self.FrameOrder, orient='vertical', command=self.libox_ShopInfo.yview)
+        xsb = Scrollbar(self.FrameOrder, orient='horizontal', command=self.libox_ShopInfo.xview)
+        self.libox_ShopInfo.configure(yscroll=ysb.set, xscroll=xsb.set)
+        ysb.config(command=self.libox_ShopInfo.yview)
+        xsb.config(command=self.libox_ShopInfo.xview)
+        ysb.pack(side=tk.RIGHT, fill=tk.Y)
+        xsb.pack(side=tk.BOTTOM, fill=tk.X)
+
+        self.btnSettlement = tk.Button(self.FrameOrder, text='结算', command=self.event_addToOrder
+                                       , relief='groove', font=(u'幼圆', 14))
+        self.btnEditShop = tk.Button(self.FrameOrder, text='编辑数量', command=self.event_editOcount
+                                     , relief='groove', font=(u'幼圆', 14))
+        self.btnDelShop = tk.Button(self.FrameOrder, text='移出购物车', command=self.event_removeFromShop
+                                    , relief='groove', font=(u'幼圆', 14))
+        self.btnFlash = tk.Button(self.FrameOrder, text='刷新', command=self.b_shopping
+                                  , relief='groove', font=(u'幼圆', 14))
+        self.btnDelShop.place(relx=0.31, rely=0.83, relwidth=0.18, relheight=0.07)
+        self.btnEditShop.place(relx=0.51, rely=0.83, relwidth=0.15, relheight=0.07)
+        self.btnSettlement.place(relx=0.76, rely=0.83, relwidth=0.11, relheight=0.07)
+        self.btnFlash.place(relx=0.1, rely=0.83, relwidth=0.11, relheight=0.07)
 
     def Search(self):
         #TODO 搜索
@@ -386,7 +427,7 @@ class User(Frame):
 
         self.btnEditPswd = tk.Button(self.FrameUser, text='修改密码', command=self.EditUserPswd
                                        , relief='groove',font = (u'幼圆',14))
-        self.btnEditUserInfo = tk.Button(self.FrameUser, text='编辑信息', command=self.event_editUserInfo
+        self.btnEditUserInfo = tk.Button(self.FrameUser, text='修改信息', command=self.event_editUserInfo
                                      , relief='groove',font = (u'幼圆',14))
         self.btnEditPswd.place(relx=0.32, rely=0.85, relwidth=0.15, relheight=0.07)
         self.btnEditUserInfo.place(relx=0.52, rely=0.85, relwidth=0.15, relheight=0.07)
@@ -418,6 +459,11 @@ class User(Frame):
         Line_s.place(relx=0.0, rely=0.08, relwidth=1, relheight=0.007)
 
         def RePswd():
+            '''
+            确认修改密码，检测原密码是否正确。新密码是否输入一致
+            全部信息确认无误后提交到数据库
+            :return: 
+            '''
             cur.execute('select Cid,Cpswd from customer where Cid = %d'% self.Cid)
             #conn.commit()
             userPswd = cur.fetchall()
@@ -439,6 +485,52 @@ class User(Frame):
         btnEditUserInfo = tk.Button(FrameEditPswd,text='确认修改',command=RePswd,relief='groove',font=(u'幼圆', 14))
         btnEditUserInfo.place(relx=0.58, rely=0.8, relwidth=0.3, relheight=0.12)
 
+    def EditShopOcount(self):
+        FrameEditShopO = tk.LabelFrame(self.FrameShopping)
+        FrameEditShopO.place(relx=0.35, rely=0.3, relwidth=0.3, relheight=0.3)
+
+        label_title = Label(FrameEditShopO, text='修改数量', font=14)
+        label_title.place(relx=0.0, rely=0.0, relwidth=0.4, relheight=0.2)
+
+        entry_shopNum = Entry(FrameEditShopO, font=(u'宋体', 14))
+        entry_shopNum.place(relx=0.3, rely=0.35, relwidth=0.4, relheight=0.2)
+
+        Line_s = Separator(FrameEditShopO, orient='horizontal', style='Line1.TSeparator')
+        Line_s.place(relx=0.0, rely=0.2, relwidth=1, relheight=0.007)
+
+        def reNum():
+            '''
+            确认修改数量，自动修改相应的总价
+            :return: 
+            '''
+            self.cur.execute('select ISBN,Bname from book')
+            self.BookInfo = self.cur.fetchall()
+            list_bookName = ''#保存ISBN
+            list_box_bookname = self.libox_ShopInfo.item(self.libox_ShopInfo.focus(), "values")[0]#保存选中的书的ISBN
+            for i in self.BookInfo:
+                if list_box_bookname == i[1]:
+                    list_bookName = i[0]
+                    break
+            list_bookNum = self.libox_ShopInfo.item(self.libox_ShopInfo.focus(), "values")[2]#保存数量
+            list_bookPrice = self.libox_ShopInfo.item(self.libox_ShopInfo.focus(), "values")[3]#保存总价
+            if entry_shopNum.get()!='':  #判断输入数量是否不空
+                if entry_shopNum.get().isdigit(): #判断输入是否为数字
+                    num =  int(entry_shopNum.get())  #获取已有书本数
+                    price =  float(list_bookPrice)/int(list_bookNum)*num #获取书籍单价
+                    cur.execute('update shopping set Ocount = %d,price = %.2f where Cid = %d and ISBN = %s'%(num,price,self.Cid,list_bookName))
+                    conn.commit()
+                    FrameEditShopO.destroy()
+                    showinfo('提示','修改成功')
+                else:
+                    showwarning('警告','只能输入整数')
+            else:
+                showwarning('警告','值不能为空')
+
+
+        btnEditUserInfo = tk.Button(FrameEditShopO,text='确认',command = reNum
+                                    ,relief='groove',font=(u'幼圆', 14))
+        btnEditUserInfo.place(relx=0.3, rely=0.65, relwidth=0.4, relheight=0.2)
+
 class Application(User):
     #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
     def __init__(self, master=None):
@@ -456,7 +548,7 @@ class Application(User):
         if self.maxpage < len(self.BookInfo) / 8.0:
             self.num = len(self.BookInfo) % 8
 
-        self.Cid = 70003
+        self.Cid = 70001
 
         User.__init__(self, master)
 
@@ -470,7 +562,7 @@ class Application(User):
         pass
         self.Search()
 
-    def b_shopping(self, event=None):
+    def b_shopping(self):
         '''
         查看购物车信息，可以结算，可以编辑购物车，包括修改已有书籍数量，和删除已有的购物项
         :param event: 
@@ -510,10 +602,37 @@ class Application(User):
             cur.execute('update shopping set ocount = %d,price = %.2f where cid = %d and isbn = %s' % (
                 Ocount + s[0][0], price, self.Cid, ISBN))
             conn.commit()
-            print '追加成功'
+            showinfo('提示','追加成功！')
         except:
             conn.commit()
-            print '添加成功'
+            showinfo('提示','添加成功！')
+
+    def event_editOcount(self):
+        #TODO 编辑购物车书籍数量
+        pass
+
+        if self.libox_ShopInfo.focus():
+            self.btnSettlement.configure(state = 'disable')
+            self.btnEditShop.configure(state = 'disable')
+            self.btnDelShop.configure(state = 'disable')
+            self.EditShopOcount()
+        else:
+            showwarning('警告','选择要修改的项目')
+
+    def event_removeFromShop(self):
+        #TODO 将书籍移出购物车
+        if self.libox_ShopInfo.focus():
+            list_bookName = ''
+            list_box_bookname = self.libox_ShopInfo.item(self.libox_ShopInfo.focus(), "values")[0]  # 保存选中的书的ISBN
+            for i in self.BookInfo:
+                if list_box_bookname == i[1]:
+                    list_bookName = i[0]
+                    break
+            if  'yes' == askquestion('移除','真的要移出购物车吗?'):
+                cur.execute("delete from shopping where Cid = %d and ISBN = '%s'"%(self.Cid,list_bookName))
+                conn.commit()
+        else:
+            showwarning('警告','请选择要移除的项目')
 
     def SearchToDet(self):
         '''
@@ -532,8 +651,6 @@ class Application(User):
         完成搜索功能，支持模糊搜索，把搜索结果添加到treeview中
         :return: 
         '''
-        #TODO 搜索功能
-        #print self.BookInfo
         cur.execute('select ISBN,Bname,Bauth from book')
         self.BookInfo = cur.fetchall()
         self.libox_bookInfo.delete(*self.libox_bookInfo.get_children())
@@ -551,15 +668,19 @@ class Application(User):
         pass
 
     def event_editUserInfo(self):
-        #TODO 编辑用户信息，将文本框设置为普通模式，
+        '''
+        编辑用户信息，将文本框设置为普通模式
+        将按钮文本显示为确认
+        '''
         for i in range(7):
-            #self.entryname[i].insert('insert',self.userValues[i])
             self.entryname[i].configure(state = 'normal')
         self.btnEditUserInfo.configure(text = '确认',command = self.event_confirm)
 
     def event_confirm(self):
-        #TODO 确认用户修改信息,将模式设置为不可用
-        # ，读取文本框的数据，写回数据库，并提示完成修改
+        ''' 
+        确认用户修改信息,将模式设置为不可用
+        读取文本框的数据，写回数据库，并提示完成修改
+        '''
         for i in range(7):
             self.userValues[i] = self.entryname[i].get()
         self.justy_userInfo()
@@ -567,7 +688,7 @@ class Application(User):
             for i in range(7):
                 self.entryname[i].configure(state='readonly')
 
-            self.btnEditUserInfo.configure(text = '编辑信息',command = self.event_editUserInfo)
+            self.btnEditUserInfo.configure(text = '修改信息',command = self.event_editUserInfo)
             comm = "update customer set Cuser='%s',Csex='%s',Creal='%s',Cpost=%d,Cemail='%s',Cnumber='%s',Caddress='%s' where cid = %d"%(
                 self.userValues[0],self.userValues[1],self.userValues[2],int(self.userValues[3])
                      ,self.userValues[4],self.userValues[5],self.userValues[6]
@@ -577,7 +698,6 @@ class Application(User):
             conn.commit()
             #print comm
             showinfo('提示', '修改成功')
-
 
     def justy_userInfo(self):
         '''
