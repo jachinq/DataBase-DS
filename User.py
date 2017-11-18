@@ -384,12 +384,60 @@ class User(Frame):
         self.entryname[6].place(relx=0.27, rely=0.65, relwidth=0.45, relheight=0.16)
 
 
-        self.btnEditPswd = tk.Button(self.FrameUser, text='修改密码', command=self.event_addToOrder
+        self.btnEditPswd = tk.Button(self.FrameUser, text='修改密码', command=self.EditUserPswd
                                        , relief='groove',font = (u'幼圆',14))
         self.btnEditUserInfo = tk.Button(self.FrameUser, text='编辑信息', command=self.event_editUserInfo
                                      , relief='groove',font = (u'幼圆',14))
         self.btnEditPswd.place(relx=0.32, rely=0.85, relwidth=0.15, relheight=0.07)
         self.btnEditUserInfo.place(relx=0.52, rely=0.85, relwidth=0.15, relheight=0.07)
+
+    def EditUserPswd(self):
+        FrameEditPswd = tk.LabelFrame(self.FrameUser)
+
+        FrameEditPswd.place(relx=0.2, rely=0.35, relwidth=0.55, relheight=0.6)
+        #top.withdraw()top.state("zoomed")
+        #top.deiconify()
+        label_pswd = Label(FrameEditPswd,text = '修改密码',font = 14)
+        label_pswd.place(relx=0.0, rely=0.0, relwidth=0.2, relheight=0.08)
+
+        label_orgin = Label(FrameEditPswd,text = '原密码',font = 14)
+        label_newpswd = Label(FrameEditPswd,text = '新密码',font = 14)
+        label_repswd = Label(FrameEditPswd,text = '确认密码',font = 14)
+        label_orgin.place(relx=0.08, rely=0.2, relwidth=0.2, relheight=0.1)
+        label_newpswd.place(relx=0.08, rely=0.4, relwidth=0.2, relheight=0.1)
+        label_repswd.place(relx=0.08, rely=0.6, relwidth=0.2, relheight=0.1)
+        entry_orgin = Entry(FrameEditPswd,font=(u'宋体', 14))
+        entry_newpswd = Entry(FrameEditPswd,font=(u'宋体', 14),show = '*')
+        entry_repswd = Entry(FrameEditPswd,font=(u'宋体', 14),show = '*')
+
+        entry_orgin.place(relx=0.28, rely=0.2, relwidth=0.6, relheight=0.12)
+        entry_newpswd.place(relx=0.28, rely=0.4, relwidth=0.6, relheight=0.12)
+        entry_repswd.place(relx=0.28, rely=0.6, relwidth=0.6, relheight=0.12)
+
+        Line_s = Separator(FrameEditPswd, orient='horizontal', style='Line1.TSeparator')
+        Line_s.place(relx=0.0, rely=0.08, relwidth=1, relheight=0.007)
+
+        def RePswd():
+            cur.execute('select Cid,Cpswd from customer where Cid = %d'% self.Cid)
+            #conn.commit()
+            userPswd = cur.fetchall()
+            #print entry_orgin.get()
+            if entry_orgin.get() != userPswd[0][1]:
+                showerror('Error','原密码错误')
+            elif entry_newpswd.get()==entry_repswd.get():
+                if entry_newpswd.get()!='':
+                    comm = "update customer set Cpswd = '%s' where cid = %d"%(entry_repswd.get(),self.Cid)
+                    cur.execute(comm)
+                    conn.commit()
+                    FrameEditPswd.destroy()
+                    showinfo('提示','修改成功')
+                else:
+                    showerror('错误','密码不能为空')
+            else:
+                showerror('错误','两次输入密码不一致')
+
+        btnEditUserInfo = tk.Button(FrameEditPswd,text='确认修改',command=RePswd,relief='groove',font=(u'幼圆', 14))
+        btnEditUserInfo.place(relx=0.58, rely=0.8, relwidth=0.3, relheight=0.12)
 
 class Application(User):
     #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
@@ -504,7 +552,6 @@ class Application(User):
 
     def event_editUserInfo(self):
         #TODO 编辑用户信息，将文本框设置为普通模式，
-        print self.userInfo
         for i in range(7):
             #self.entryname[i].insert('insert',self.userValues[i])
             self.entryname[i].configure(state = 'normal')
@@ -566,6 +613,8 @@ class Application(User):
         if '' == self.userValues[6]:
             showerror('错误', '地址不能为空')
             self.userInfoFlag = False
+
+
 
 conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
                            , database='BookStore', charset="utf8")
