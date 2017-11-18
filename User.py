@@ -22,6 +22,11 @@ class User(Frame):
         top.mainloop()
 
     def Main(self,top):
+        '''
+        程序主界面？反正有负责整个软件的五大功能的组成
+        :param top: 
+        :return: 
+        '''
         #五个图标
         self.ico_book = ImageTk.PhotoImage(Image.open(r'ico\book.png'))
         self.ico_user = ImageTk.PhotoImage(Image.open(r'ico\user.png'))
@@ -49,15 +54,16 @@ class User(Frame):
         self.b_user.grid(column=1,row = 4)
 
     def Page(self):
-        #TODO 实现翻页
-        pass
+        '''
+        图书浏览主界面设计，包括翻页浏览
+        :return: 
+        '''
         cur.execute('select ISBN,Bname from book')
         self.BookInfo = cur.fetchall()
 
         def pro():
             if self.bookpage > 0:
                 self.bookpage -= 1
-                # print self.bookpage
                 self.Page()
 
         def nex():
@@ -126,41 +132,35 @@ class User(Frame):
         #do = ['do' + str(i) for i in range(8)]
 
         def do0(event):
-            print self.BookInfo[8 * self.bookpage + 0][0],self.BookInfo[8 * self.bookpage + 0][1]
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 0][0]
         self.Btn[0].bind('<Button-1>', do0)
         def do1(event):
-            print self.BookInfo[8 * self.bookpage + 1][0],self.BookInfo[8 * self.bookpage + 1][1]
             self.BookInfoISBN =  self.BookInfo[8 * self.bookpage + 1][0]
         self.Btn[1].bind('<Button-1>', do1)
         def do2(event):
-            print self.BookInfo[8 * self.bookpage + 2][0],self.BookInfo[8 * self.bookpage + 2][1]
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 2][0]
         self.Btn[2].bind('<Button-1>', do2)
         def do3(event):
-            print self.BookInfo[8 * self.bookpage + 3][0],self.BookInfo[8 * self.bookpage + 3][1]
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 3][0]
         self.Btn[3].bind('<Button-1>', do3)
         def do4(event):
-            print self.BookInfo[8 * self.bookpage + 4][0],self.BookInfo[8 * self.bookpage + 4][1]
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 4][0]
         self.Btn[4].bind('<Button-1>', do4)
         def do5(event):
-            print self.BookInfo[8 * self.bookpage + 5][0],self.BookInfo[8 * self.bookpage + 5][1]
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 5][0]
         self.Btn[5].bind('<Button-1>', do5)
         def do6(event):
-            print self.BookInfo[8 * self.bookpage + 6][0],self.BookInfo[8 * self.bookpage + 6][1]
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 6][0]
         self.Btn[6].bind('<Button-1>', do6)
         def do7(event):
-            print self.BookInfo[8 * self.bookpage + 7][0],self.BookInfo[8 * self.bookpage + 7][1]
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 7][0]
         self.Btn[7].bind('<Button-1>', do7)
 
     def Det(self):
-        #TODO 详情查看
-        pass
+        '''
+        详情页查看界面设计
+        :return: 
+        '''
         style = Style()
         style.configure('bookDet.TLabel', relief='flat'
                         , font=(u'幼圆', 12), anchor='center'
@@ -231,8 +231,10 @@ class User(Frame):
         self.Text_list[5].config(yscrollcommand=S.set)
 
     def Shopping(self):
-        #TODO 购物车
-        pass
+        '''
+        购物车界面设计
+        :return: 
+        '''
         self.FrameShopping =  tk.LabelFrame(top,text = '购物车',background = 'white')
         self.FrameShopping.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.87,)
 
@@ -275,52 +277,44 @@ class User(Frame):
         self.btnFlash.place(relx=0.1, rely=0.83, relwidth=0.11, relheight=0.07)
 
     def Order(self):
-        #TODO 订单
-        pass
+        '''
+        订单界面设计
+        :return: 
+        '''
         self.FrameOrder =  tk.LabelFrame(top,text = '订单',background = 'white')
         self.FrameOrder.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.87,)
 
         # Treeview组件，6列，显示表头，带垂直滚动条
-        self.libox_ShopInfo = Treeview(self.FrameOrder,
-                                       columns=('c1', 'c2', 'c3', 'c4'),
-                                       show="headings")
-        self.libox_ShopInfo.column('c1', width=200, anchor='center')
-        self.libox_ShopInfo.column('c2', width=40, anchor='center')
-        self.libox_ShopInfo.column('c3', width=10, anchor='center')
-        self.libox_ShopInfo.column('c4', width=40, anchor='center')
-
+        self.libox_OrderInfo = Treeview(self.FrameOrder,
+                                       columns=('c1','c2','c3','c4'),)
+                                       #show="tree")
+        self.libox_OrderInfo.column('c1', width=20, anchor='center')
+        self.libox_OrderInfo.column('c2', width=8, anchor='center')
+        self.libox_OrderInfo.column('c3', width=8, anchor='center')
+        self.libox_OrderInfo.column('c4', width=8, anchor='center')
         # 设置每列表头标题文本
-        self.libox_ShopInfo.heading('c1', text='书名')
-        self.libox_ShopInfo.heading('c2', text='单价')
-        self.libox_ShopInfo.heading('c3', text='数量')
-        self.libox_ShopInfo.heading('c4', text='总价')
+        self.libox_OrderInfo.heading('c1', text='书名')
+        self.libox_OrderInfo.heading('c2', text='数量')
+        self.libox_OrderInfo.heading('c3', text='总价')
+        self.libox_OrderInfo.heading('c4', text='付款')
 
-        self.libox_ShopInfo.place(relx=0.1, rely=0.08, relwidth=0.77, relheight=0.7)
+
+
+        self.libox_OrderInfo.place(relx=0.1, rely=0.08, relwidth=0.77, relheight=0.8)
         # 滚动条
-        ysb = Scrollbar(self.FrameOrder, orient='vertical', command=self.libox_ShopInfo.yview)
-        xsb = Scrollbar(self.FrameOrder, orient='horizontal', command=self.libox_ShopInfo.xview)
-        self.libox_ShopInfo.configure(yscroll=ysb.set, xscroll=xsb.set)
-        ysb.config(command=self.libox_ShopInfo.yview)
-        xsb.config(command=self.libox_ShopInfo.xview)
+        ysb = Scrollbar(self.FrameOrder, orient='vertical', command=self.libox_OrderInfo.yview)
+        xsb = Scrollbar(self.FrameOrder, orient='horizontal', command=self.libox_OrderInfo.xview)
+        self.libox_OrderInfo.configure(yscroll=ysb.set, xscroll=xsb.set)
+        ysb.config(command=self.libox_OrderInfo.yview)
+        xsb.config(command=self.libox_OrderInfo.xview)
         ysb.pack(side=tk.RIGHT, fill=tk.Y)
         xsb.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.btnSettlement = tk.Button(self.FrameOrder, text='结算', command=self.event_addToOrder
-                                       , relief='groove', font=(u'幼圆', 14))
-        self.btnEditShop = tk.Button(self.FrameOrder, text='编辑数量', command=self.event_editOcount
-                                     , relief='groove', font=(u'幼圆', 14))
-        self.btnDelShop = tk.Button(self.FrameOrder, text='移出购物车', command=self.event_removeFromShop
-                                    , relief='groove', font=(u'幼圆', 14))
-        self.btnFlash = tk.Button(self.FrameOrder, text='刷新', command=self.b_shopping
-                                  , relief='groove', font=(u'幼圆', 14))
-        self.btnDelShop.place(relx=0.31, rely=0.83, relwidth=0.18, relheight=0.07)
-        self.btnEditShop.place(relx=0.51, rely=0.83, relwidth=0.15, relheight=0.07)
-        self.btnSettlement.place(relx=0.76, rely=0.83, relwidth=0.11, relheight=0.07)
-        self.btnFlash.place(relx=0.1, rely=0.83, relwidth=0.11, relheight=0.07)
-
     def Search(self):
-        #TODO 搜索
-        pass
+        '''
+        搜索界面设计
+        :return: 
+        '''
         self.style = Style()
         self.style.configure('TSeparator', background='#000000')
         self.style.configure('search.TLabel', anchor='w', font=(u'幼圆', 14),background = 'white'
@@ -381,8 +375,10 @@ class User(Frame):
         #self.libox_bookInfo.bind('<Double-Button-1>',self.SearchToDet)
 
     def User(self):
-        #TODO 账户
-        pass
+        '''
+        账户个人界面设计
+        :return: 
+        '''
         style = Style()
         style.configure('user.TLabel', anchor='w', font=(u'幼圆', 14), background='white'
                         , relief='flat', foreground='#4141CF')
@@ -433,6 +429,10 @@ class User(Frame):
         self.btnEditUserInfo.place(relx=0.52, rely=0.85, relwidth=0.15, relheight=0.07)
 
     def EditUserPswd(self):
+        '''
+        账户个人修改密码时弹出的界面-设计
+        :return: 
+        '''
         FrameEditPswd = tk.LabelFrame(self.FrameUser)
 
         FrameEditPswd.place(relx=0.2, rely=0.35, relwidth=0.55, relheight=0.6)
@@ -467,7 +467,6 @@ class User(Frame):
             cur.execute('select Cid,Cpswd from customer where Cid = %d'% self.Cid)
             #conn.commit()
             userPswd = cur.fetchall()
-            #print entry_orgin.get()
             if entry_orgin.get() != userPswd[0][1]:
                 showerror('Error','原密码错误')
             elif entry_newpswd.get()==entry_repswd.get():
@@ -486,6 +485,10 @@ class User(Frame):
         btnEditUserInfo.place(relx=0.58, rely=0.8, relwidth=0.3, relheight=0.12)
 
     def EditShopOcount(self):
+        '''
+        购物车界面弹出修改书籍数量的弹窗设计
+        :return: 
+        '''
         FrameEditShopO = tk.LabelFrame(self.FrameShopping)
         FrameEditShopO.place(relx=0.35, rely=0.3, relwidth=0.3, relheight=0.3)
 
@@ -578,9 +581,25 @@ class Application(User):
                 ,self.ShopInfo[i][5], self.ShopInfo[i][6]])
 
     def b_order(self, event=None):
-        #TODO 订单界面
-        pass
+        '''
+        显示用户的订单
+        :param event: 
+        :return: 
+        '''
         self.Order()
+        cur.execute("select distinct Oid from orderinfo where cid = %d" % self.Cid)
+        self.OrderInfo = cur.fetchall()
+        comm = "select Bname,Ocount,price from orderinfo where cid = %d and Oid = '%s'" \
+               % (self.Cid, str(self.OrderInfo[0][0]))
+        cur.execute(comm)
+        self.OrderBookInfo = cur.fetchall()
+        price = 0
+        for i in range(len(self.OrderInfo)):
+            root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
+            for j in range(len(self.OrderBookInfo)):
+                self.libox_OrderInfo.insert(root_node, 'end', v=[str(self.OrderBookInfo[j][0].encode('utf-8')).strip(), self.OrderBookInfo[j][1], self.OrderBookInfo[j][2]])
+                price += int(self.OrderBookInfo[j][2])
+            self.libox_OrderInfo.insert(root_node,'end',v = ['','','',price])
 
     def b_user(self, event=None):
         #TODO 用户个人界面
@@ -696,7 +715,6 @@ class Application(User):
             comm = str(comm.encode('utf-8'))
             cur.execute(comm)
             conn.commit()
-            #print comm
             showinfo('提示', '修改成功')
 
     def justy_userInfo(self):
@@ -733,7 +751,6 @@ class Application(User):
         if '' == self.userValues[6]:
             showerror('错误', '地址不能为空')
             self.userInfoFlag = False
-
 
 
 conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
