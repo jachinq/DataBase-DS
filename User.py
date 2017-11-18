@@ -587,19 +587,23 @@ class Application(User):
         :return: 
         '''
         self.Order()
+
         cur.execute("select distinct Oid from orderinfo where cid = %d" % self.Cid)
         self.OrderInfo = cur.fetchall()
-        comm = "select Bname,Ocount,price from orderinfo where cid = %d and Oid = '%s'" \
-               % (self.Cid, str(self.OrderInfo[0][0]))
-        cur.execute(comm)
-        self.OrderBookInfo = cur.fetchall()
-        price = 0
-        for i in range(len(self.OrderInfo)):
-            root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
-            for j in range(len(self.OrderBookInfo)):
-                self.libox_OrderInfo.insert(root_node, 'end', v=[str(self.OrderBookInfo[j][0].encode('utf-8')).strip(), self.OrderBookInfo[j][1], self.OrderBookInfo[j][2]])
-                price += int(self.OrderBookInfo[j][2])
-            self.libox_OrderInfo.insert(root_node,'end',v = ['','','',price])
+        if self.OrderInfo:
+            comm = "select Bname,Ocount,price from orderinfo where cid = %d and Oid = '%s'" \
+                   % (self.Cid, str(self.OrderInfo[0][0]))
+            cur.execute(comm)
+            self.OrderBookInfo = cur.fetchall()
+            price = 0
+            for i in range(len(self.OrderInfo)):
+                root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
+                for j in range(len(self.OrderBookInfo)):
+                    self.libox_OrderInfo.insert(root_node, 'end', v=[str(self.OrderBookInfo[j][0].encode('utf-8')).strip(), self.OrderBookInfo[j][1], self.OrderBookInfo[j][2]])
+                    price += int(self.OrderBookInfo[j][2])
+                self.libox_OrderInfo.insert(root_node,'end',v = ['','','',price])
+        else:
+            self.libox_OrderInfo.insert('', 'end', text=['你还没有下过订单'])
 
     def b_user(self, event=None):
         #TODO 用户个人界面
@@ -685,6 +689,12 @@ class Application(User):
     def event_addToOrder(self):
         #TODO 把购物车的书籍清空，生成相应的的订单
         pass
+        cur.execute('select * from shopping where Cid = %d'%self.Cid)
+        shopInfo = cur.fetchall()
+        if shopInfo:
+            print shopInfo
+        else:
+            showerror('错误','你的购物车为空')
 
     def event_editUserInfo(self):
         '''
