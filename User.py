@@ -503,6 +503,8 @@ class User(Frame):
             '''
             self.cur.execute('select ISBN,Bname from book')
             self.BookInfo = self.cur.fetchall()
+            cur.execute('select ISBN,Bname from book')
+            self.BookInfo = cur.fetchall()
             list_bookName = ''#保存ISBN
             list_box_bookname = self.libox_ShopInfo.item(self.libox_ShopInfo.focus(), "values")[0]#保存选中的书的ISBN
             for i in self.BookInfo:
@@ -543,7 +545,7 @@ class Application(User):
         self.bookpage = 0
         self.maxpage = len(self.BookInfo) / 8
         self.num = 0
-        if self.maxpage < len(self.BookInfo) / 8.0:
+        if self.maxpage < (len(self.BookInfo) / 8.0):
             self.num = len(self.BookInfo) % 8
 
         self.Cid = Cid
@@ -656,6 +658,10 @@ class Application(User):
             if  'yes' == askquestion('移除','真的要移出购物车吗?'):
                 cur.execute("delete from shopping where Cid = %d and ISBN = '%s'"%(self.Cid,list_bookName))
                 conn.commit()
+                showinfo('提示','已经移出购物车')
+                self.btnSettlement.configure(state='disable')
+                self.btnEditShop.configure(state='disable')
+                self.btnDelShop.configure(state='disable')
         else:
             showwarning('警告','请选择要移除的项目')
 
@@ -812,8 +818,7 @@ class Application(User):
             showerror('错误', '邮编格式错误')
             self.userInfoFlag = False
 
-        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$"
-                , self.userValues[4]) == None:
+        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", self.userValues[4]) == None:
             showerror('错误', 'Email格式错误')
             self.userInfoFlag = False
 
