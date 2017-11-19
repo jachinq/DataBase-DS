@@ -2,128 +2,153 @@
 
 from HeadFile import *
 
-d = {}
-class Application_ui(Frame):
-    #这个类仅实现界面生成功能，具体事件处理代码在子类Application中。
+class Login_ui(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
-        self.image = Image.open("back.thumbnail")
-        self.im = ImageTk.PhotoImage(self.image)
         self.master.title('欢迎')
         self.master.geometry('400x350+500+150')
         self.master.resizable(0,0)
         self.create_Background()
-        self.create_login()
 
+
+        self.style = Style()
+        self.style.configure('TButton',font=('幼圆',14,'bold'),relief = 'groove')
+        self.style.configure('TLabel',anchor='w', font=('幼圆',14,'bold'),background = 'white')
+        self.style.configure('TLabelframe',background='white', font=(u'宋体', 14))
+
+        self.create_Main()
+        self.create_login()
         self.master.mainloop()
 
+    def create_Main(self):
+        '''
+        程序主界面
+        :param top: 
+        :return: 
+        '''
+        #五个图标
+        self.ico_book = ImageTk.PhotoImage(Image.open(r'ico\book.png'))
+        self.ico_user = ImageTk.PhotoImage(Image.open(r'ico\user.png'))
+        self.ico_search = ImageTk.PhotoImage(Image.open(r'ico\search.png'))
+        self.ico_shopping = ImageTk.PhotoImage(Image.open(r'ico\shopping.png'))
+        self.ico_order = ImageTk.PhotoImage(Image.open(r'ico\order.png'))
+
+        self.FrameMenu = tk.LabelFrame(login_windows,text = '',background = 'white')
+        self.FrameMenu.place(relx=0.02, rely=0.35, relwidth=0.96, relheight=0.62)
+
+        self.b_register = tk.Button(login_windows, text='登陆', command=self.create_login
+                                    , font=('幼圆', 14, 'bold'), relief='groove', fg='blue')
+        self.b_register.place(relx=0.02, rely=0.26, relwidth=0.15, relheight=0.09)
+
+        self.b_register = tk.Button(login_windows, text='注册', command=self.create_register
+                                    , font=('幼圆', 14, 'bold'), relief='groove', fg='blue')
+        self.b_register.place(relx=0.17, rely=0.26, relwidth=0.15, relheight=0.09)
+
+        self.b_admin = tk.Button(login_windows, text='管理员', command=self.create_admin
+                                 , font=('幼圆', 14, 'bold'), relief='groove', fg='blue')
+        self.b_admin.place(relx=0.78, rely=0.26, relwidth=0.2, relheight=0.09)
+
     def create_Background(self):
+        self.image = Image.open("back.thumbnail")
+        self.im = ImageTk.PhotoImage(self.image)
         self.picture = tk.Canvas(self.master,bg = 'gray')
         self.picture.create_image(0,0,anchor = 'nw', image=self.im)
         self.picture.place(relx=0.01, rely=0.01, relwidth=0.98, relheight=0.30)
 
     def create_login(self):
-        self.top = self.winfo_toplevel()
+        
+        FrameUserLogin = Frame(login_windows,style='TLabelframe')
+        FrameUserLogin.place(relx=0.02, rely=0.35, relwidth=0.96, relheight=0.62)
 
-        self.style = Style()
-        self.style.configure('TButton',font=('幼圆',14,'bold'),relief = 'groove')
-        self.style.configure('TLabel',anchor='w', font=('幼圆',14,'bold'))
+        self.b_login = Button(FrameUserLogin, text='登陆', command=self.b_login_cmd, style='TButton')
+        self.b_login.place(relx=0.65, rely=0.755, relwidth=0.16, relheight=0.13)
 
-        self.style.configure('Frame1.TLabelframe', foreground='#000000', background='white', font=(u'宋体', 14))
-        Frame1 = LabelFrame(top,text = '',style='Frame1.TLabelframe')
-        Frame1.place(relx=0.02, rely=0.316, relwidth=0.96, relheight=0.65)
-
-        self.b_login = Button(Frame1, text='登陆', command=self.b_login_cmd, style='TButton')
-        self.b_login.place(relx=0.656, rely=0.755, relwidth=0.16, relheight=0.15)
-
-        self.Label1 = Label(Frame1, text='账号', style='TLabel')
-        self.Label1.place(relx=0.15, rely=0.25, relwidth=0.13, relheight=0.15)
-
-        self.Text1Var = tk.StringVar(value='')
-        self.Text1 = Entry(Frame1, textvariable=self.Text1Var, font=('宋体',14))
-        self.Text1.place(relx=0.356, rely=0.25, relwidth=0.6, relheight=0.2)
-
-        self.Text2Var = tk.StringVar(value='')
-        self.Text2 = Entry(Frame1, textvariable=self.Text2Var, font=('宋体',14),show = '*')
-        self.Text2.place(relx=0.356, rely=0.5, relwidth=0.6, relheight=0.2)
-
-        self.Label2 = Label(Frame1, text='密码', style='TLabel')
-        self.Label2.place(relx=0.15, rely=0.5, relwidth=0.13, relheight=0.15)
-
-        self.b_register = tk.Button(self.top, text='登陆', command=self.create_login
-                                    ,font=('幼圆', 14, 'bold'), relief='groove',fg = 'blue')
-        self.b_register.place(relx=0.02, rely=0.255, relwidth=0.15, relheight=0.09)
-
-        self.b_register = tk.Button(self.top, text='注册', command=self.create_register
-                                    , font=('幼圆', 14, 'bold'), relief='groove',fg = 'blue')
-        self.b_register.place(relx=0.17, rely=0.255, relwidth=0.15, relheight=0.09)
-
+        self.Label1 = Label(FrameUserLogin, text='账号', style='TLabel')
+        self.Label2 = Label(FrameUserLogin, text='密码', style='TLabel')
+        self.Label1.place(relx=0.12, rely=0.27, relwidth=0.13, relheight=0.13)
+        self.Label2.place(relx=0.12, rely=0.5, relwidth=0.13, relheight=0.13)
+        
+        self.textLoginUser = tk.StringVar(value='Amy')
+        self.textLoginPswd = tk.StringVar(value='123')
+        self.entry_LoginUser = Entry(FrameUserLogin, textvariable=self.textLoginUser, font=('宋体', 14))
+        self.entry_LoginPswd = Entry(FrameUserLogin, textvariable=self.textLoginPswd, font=('宋体',14),show = '*')
+        self.entry_LoginPswd.place(relx=0.32, rely=0.5, relwidth=0.6, relheight=0.16)
+        self.entry_LoginUser.place(relx=0.32, rely=0.27, relwidth=0.6, relheight=0.16)
 
     def create_register(self):
-        self.top = self.winfo_toplevel()
+        FrameUserRegister = Frame(login_windows, style='TLabelframe')
+        FrameUserRegister.place(relx=0.02, rely=0.35, relwidth=0.96, relheight=0.62)
 
-        self.style = Style()
-        self.style.configure('TButton', font=('幼圆', 14, 'bold'), relief='groove')
-        self.style.configure('TLabel', anchor='w', font=('幼圆', 14, 'bold'))
+        self.b_register = Button(FrameUserRegister, text='确认注册', style='TButton')
+        self.b_register.place(relx=0.556, rely=0.755, relwidth=0.26, relheight=0.13)
 
-        self.style.configure('Frame1.TLabelframe', foreground='#000000', background='white', font=(u'宋体', 14))
-        Frame1 = LabelFrame(top, text='', style='Frame1.TLabelframe')
-        Frame1.place(relx=0.02, rely=0.316, relwidth=0.96, relheight=0.65)
+        self.label_RegisterUser = Label(FrameUserRegister, text='账号', style='TLabel')
+        self.label_RegisterPswd = Label(FrameUserRegister, text='密码', style='TLabel')
+        self.label_RegisterRePswd = Label(FrameUserRegister, text='确认密码', style='TLabel')
+        self.label_RegisterUser.place(relx=0.12, rely=0.08, relwidth=0.13, relheight=0.13)
+        self.label_RegisterPswd.place(relx=0.12, rely=0.27, relwidth=0.13, relheight=0.13)
+        self.label_RegisterRePswd.place(relx=0.08, rely=0.5, relwidth=0.26, relheight=0.13)
 
-        self.b_login = Button(Frame1, text='确认注册', style='TButton')
-        self.b_login.place(relx=0.556, rely=0.755, relwidth=0.32, relheight=0.15)
+        #self.textRegisterUser = tk.StringVar(value='')
+        #self.textRegisterPswd = tk.StringVar(value='')
+        #self.textReRegisterPswd = tk.StringVar(value='')
+        self.entry_RegisterUser = Entry(FrameUserRegister,font=('宋体', 14))#,textvariable=self.textRegisterUser
+        self.entry_RegisterPswd = Entry(FrameUserRegister, font=('宋体', 14), show ='*')#, textvariable=self.textRegisterPswd
+        self.entry_ReRegisterPswd = Entry(FrameUserRegister, font=('宋体', 14),show = '*')#, textvariable=self.textReRegisterPswd
+        self.entry_RegisterUser.place(relx=0.32, rely=0.08, relwidth=0.6, relheight=0.16)
+        self.entry_RegisterPswd.place(relx=0.32, rely=0.27, relwidth=0.6, relheight=0.16)
+        self.entry_ReRegisterPswd.place(relx=0.32, rely=0.5, relwidth=0.6, relheight=0.16)
 
-        self.Label1 = Label(Frame1, text='账号', style='TLabel')
-        self.Label1.place(relx=0.15, rely=0.01, relwidth=0.13, relheight=0.15)
+    def create_admin(self):
+        
+        FrameAdminLogin = Frame(login_windows,style='TLabelframe')
+        FrameAdminLogin.place(relx=0.02, rely=0.35, relwidth=0.96, relheight=0.62)
 
-        self.Text1Var = tk.StringVar(value='')
-        self.Text1 = Entry(Frame1, textvariable=self.Text1Var, font=('宋体', 14))
-        self.Text1.place(relx=0.356, rely=0.01, relwidth=0.6, relheight=0.2)
+        self.b_AdminLogin = Button(FrameAdminLogin, text='登陆', command=self.b_login_admin, style='TButton')
+        self.b_AdminLogin.place(relx=0.65, rely=0.755, relwidth=0.16, relheight=0.13)
 
-        self.Label2 = Label(Frame1, text='密码', style='TLabel')
-        self.Label2.place(relx=0.15, rely=0.25, relwidth=0.13, relheight=0.15)
+        self.label_AdminUser = Label(FrameAdminLogin, text='Admin', style='TLabel')
+        self.label_AdminPswd = Label(FrameAdminLogin, text='Pswd', style='TLabel')
+        self.label_AdminUser.place(relx=0.12, rely=0.27, relwidth=0.18, relheight=0.13)
+        self.label_AdminPswd.place(relx=0.12, rely=0.5, relwidth=0.13, relheight=0.13)
 
-        self.Text1Var = tk.StringVar(value='')
-        self.Text2 = Entry(Frame1, textvariable=self.Text1Var, font=('宋体', 14),show = '*')
-        self.Text2.place(relx=0.356, rely=0.25, relwidth=0.6, relheight=0.2)
+        self.textAdminUser = tk.StringVar(value='')
+        self.textAdminPswd = tk.StringVar(value='')
+        self.entry_AdminUser = Entry(FrameAdminLogin, textvariable=self.textAdminUser, font=('宋体', 14))
+        self.entry_AdminPswd = Entry(FrameAdminLogin, textvariable=self.textAdminPswd, font=('宋体',14),show = '*')
+        self.entry_AdminUser.place(relx=0.32, rely=0.27, relwidth=0.6, relheight=0.16)
+        self.entry_AdminPswd.place(relx=0.32, rely=0.5, relwidth=0.6, relheight=0.16)
 
-        self.Label3 = Label(Frame1, text='确认密码', style='TLabel')
-        self.Label3.place(relx=0.1, rely=0.5, relwidth=0.26, relheight=0.15)
-
-        self.Text2Var = tk.StringVar(value='')
-        self.Text3 = Entry(Frame1, textvariable=self.Text2Var, font=('宋体', 14),show = '*')
-        self.Text3.place(relx=0.356, rely=0.5, relwidth=0.6, relheight=0.2)
-
-
-        self.b_register = tk.Button(self.top, text='登陆', command=self.create_login
-                                    ,font=('幼圆', 14, 'bold'), relief='groove',fg = 'blue')
-        self.b_register.place(relx=0.02, rely=0.255, relwidth=0.15, relheight=0.09)
-
-        self.b_register = tk.Button(self.top, text='注册', command=self.create_register
-                                    , font=('幼圆', 14, 'bold'), relief='groove',fg = 'blue')
-        self.b_register.place(relx=0.17, rely=0.255, relwidth=0.15, relheight=0.09)
-
-class Application(Application_ui):
-    #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
+class Application(Login_ui):
     def __init__(self, master=None):
-        Application_ui.__init__(self, master)
+        Login_ui.__init__(self, master)
 
     def b_login_cmd(self):
-        d['username'] = self.Text1.get()
-        d['psw'] = self.Text2.get()
-        if d['username'] == 'sa' and d['psw'] == 'ghost':
-            try:
-                top.destroy()
-            except:
-                pass
-            import User
-        else:
-            tkinter.messagebox.showerror('错误', '账户名或密码错误')
+        comm = "select Cuser,Cpswd,Cid from customer"
+        cur.execute(comm)
+        user = cur.fetchall()
+
+        username = self.entry_LoginUser.get()
+        pswd = self.entry_LoginPswd.get()
+        Flag = True
+        for i in user:
+            if username == i[0] and pswd == i[1]:
+                Flag = False
+                try:
+                    login_windows.destroy()
+                except:
+                    askretrycancel('糟糕','要重试吗?')
+                setCid(i[2])
+                import User
+        if Flag:
+            showerror('错误', '账户名或密码错误')
+
+    def b_login_admin(self):
+        #TODO 管理员登录
+        pass
+
+if __name__ == '__main__':
+    login_windows = tk.Tk()
+    Application(login_windows)
 
 
-top = tk.Tk()
-Application(top)
-
-
-##########################################
-##########################################
