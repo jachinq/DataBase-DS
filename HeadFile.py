@@ -17,7 +17,7 @@ conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
                            , database='BookStore', charset="utf8")
 
 cur = conn.cursor()
-Cid = None
+Cid = 70001
 def setCid(n):
     global Cid
     Cid = n
