@@ -12,4 +12,13 @@ import re
 import time
 import pymssql
 
-Cid = 70003
+
+conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
+                           , database='BookStore', charset="utf8")
+
+cur = conn.cursor()
+Cid = None
+def setCid(n):
+    global Cid
+    Cid = n
+

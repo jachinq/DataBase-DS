@@ -537,9 +537,9 @@ class Application(User):
         self.style.configure("Treeview.Heading", foreground='blue')
         self.style.configure("Treeview", font=12)
 
-        self.cur = conn.cursor()
-        self.cur.execute('select ISBN,Bname from book')
-        self.BookInfo = self.cur.fetchall()
+        cur = conn.cursor()
+        cur.execute('select ISBN,Bname from book')
+        self.BookInfo = cur.fetchall()
         self.bookpage = 0
         self.maxpage = len(self.BookInfo) / 8
         self.num = 0
@@ -826,10 +826,7 @@ class Application(User):
             self.userInfoFlag = False
 
 
-conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
-                           , database='BookStore', charset="utf8")
 
-cur = conn.cursor()
 top = tk.Tk()
 Application(top)
 cur.close()
