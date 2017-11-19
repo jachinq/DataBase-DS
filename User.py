@@ -330,10 +330,10 @@ class User(Frame):
         self.var = tk.StringVar()
         self.var.set('书名')
 
-        self.r1 = Radiobutton(top, text='书名', variable=self.var, value='书名')
-        self.r1.place(relx = 0.35,rely = 0.17,relwidth = 0.07,relheight = 0.05)
-        self.r2 = Radiobutton(top, text='作者', variable=self.var, value='作者')
-        self.r2.place(relx = 0.45,rely = 0.17,relwidth = 0.07,relheight = 0.05)
+        self.r1 = Radiobutton(self.FrameSearch, text='书名', variable=self.var, value='书名')
+        self.r1.place(relx = 0.35,rely = 0.12,relwidth = 0.08,relheight = 0.05)
+        self.r2 = Radiobutton(self.FrameSearch, text='作者', variable=self.var, value='作者')
+        self.r2.place(relx = 0.45,rely = 0.12,relwidth = 0.08,relheight = 0.05)
 
         self.Line1 = Separator(self.FrameSearch, orient='horizontal', style='Line1.TSeparator')
         self.Line1.place(relx=0.14, rely=0.22, relwidth=0.69, relheight=0.007)
@@ -501,8 +501,6 @@ class User(Frame):
             确认修改数量，自动修改相应的总价
             :return: 
             '''
-            self.cur.execute('select ISBN,Bname from book')
-            self.BookInfo = self.cur.fetchall()
             cur.execute('select ISBN,Bname from book')
             self.BookInfo = cur.fetchall()
             list_bookName = ''#保存ISBN
