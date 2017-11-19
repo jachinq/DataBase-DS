@@ -594,17 +594,25 @@ class Application(User):
         self.OrderInfo = cur.fetchall()
         #TODO self.OrderInfo两个订单以上时，改数据
         if self.OrderInfo:
-            comm = "select Bname,Ocount,price from orderinfo where cid = %d and Oid = '%s'" \
-                   % (self.Cid, str(self.OrderInfo[0][0]))
-            cur.execute(comm)
-            self.OrderBookInfo = cur.fetchall()
-            price = 0
+            self.OrderBookInfos = []
+            for j in self.OrderInfo:
+                comm = "select Bname,Ocount,price from orderinfo where cid = %d and Oid = '%s'" \
+                   % (self.Cid, str(j[0]))
+                cur.execute(comm)
+                self.OrderBookInfo = cur.fetchall()
+                self.OrderBookInfos.append(self.OrderBookInfo)
+            print self.OrderBookInfos
+
             for i in range(len(self.OrderInfo)):
                 root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
-                for j in range(len(self.OrderBookInfo)):
-                    self.libox_OrderInfo.insert(root_node, 'end', v=[str(self.OrderBookInfo[j][0].encode('utf-8')).strip(), self.OrderBookInfo[j][1], self.OrderBookInfo[j][2]])
-                    price += int(self.OrderBookInfo[j][2])
-                self.libox_OrderInfo.insert(root_node,'end',v = ['','','',price])
+                price = 0
+                for j in range(len(self.OrderBookInfos)):
+                    self.libox_OrderInfo.insert(root_node, 'end',
+                                                v=[str(self.OrderBookInfos[i][j][0].encode('utf-8')).strip(),
+                                                   self.OrderBookInfos[i][j][1], self.OrderBookInfos[i][j][2]])
+                    price += int(self.OrderBookInfos[i][j][2])
+                self.libox_OrderInfo.insert(root_node, 'end', v=['', '', '', price])
+
         else:
             self.libox_OrderInfo.insert('', 'end', text=['你还没有下过订单'])
 
@@ -710,38 +718,55 @@ class Application(User):
     def event_addToOrder(self):
         #TODO 把购物车的书籍清空，生成相应的的订单
         pass
-        if 'yes' == askquestion('移除', '真的要移出购物车吗?'):
-            cur.execute('select ISBN,Ocount,price from shopping where Cid = %d'%self.Cid)
-            self.order_shopInfo = cur.fetchall()
-            if self.order_shopInfo:
-                #如果购物车非空，则读取当前用户信息的姓名，手机，地址，邮编
-                #读取cid与当前用户一致的收货人信息，一一比较
-                cur.execute("select Creal,Cnumber,Caddress,Cpost from customer where Cid = %d"%self.Cid)
-                current_UserInfo = cur.fetchall()#获取用户当前信息
-                cur.execute("select Rname,Rnum,Raddress,Rpost from receve where Cid = %d"%self.Cid)
-                ReceveInfo = cur.fetchall()#获取用户已有收货地址
-                if current_UserInfo[0] in ReceveInfo:#判断当前信息是否在收货地址中
-                    comm = "select Rid from receve where Cid = %d and Rname = '%s' and Rnum = '%s' and " \
-                           "Raddress = '%s' and Rpost = %d"%(self.Cid,str(current_UserInfo[0][0].encode('utf-8')),str(current_UserInfo[0][1].encode('utf-8'))
-                                                                ,str(current_UserInfo[0][2].encode('utf-8')),current_UserInfo[0][3])
-                    cur.execute(comm)
-                    Rid = cur.fetchall()
-                    for i in self.generate_orderInfo(Rid[0][0]):
-                        cur.execute(i)      #插入订单表，这里没有判断库存的问题
-                    conn.commit()
-                else:
-                    #如果当前用户信息不在收货人列表，则生成新的收货人
-                    Rid = len(ReceveInfo)+1
-                    comm = "insert into receve values (%d,%d,'%s','%s','%s',%d)" %(Rid,self.Cid, str(current_UserInfo[0][0].encode('utf-8')),
-                                                               str(current_UserInfo[0][1].encode('utf-8'))
-                                                               , str(current_UserInfo[0][2].encode('utf-8')),
-                                                               current_UserInfo[0][3])
-
-                    for i in self.generate_orderInfo(Rid):
-                        cur.execute(i)      #插入订单表，这里没有判断库存的问题
-                    conn.commit()
-            else:
-                showerror('错误','你的购物车为空')
+        cur.execute('select ISBN,Ocount,price from shopping where Cid = %d'%self.Cid)
+        self.order_shopInfo = cur.fetchall()
+        if self.order_shopInfo:
+            #如果购物车非空，询问是否确定下单
+            if 'yes' == askquestion('下单', '确定要下单吗?此操作将清空购物车'):
+                #确定则检查购物车书籍数量是否小于库存
+                # 获取库存的数量
+                self.Bstock = []
+                for i in range(len(self.order_shopInfo)):
+                    cur.execute("select Bname,Bstock from book where  ISBN = '%s'"%self.order_shopInfo[i][0].encode('utf-8'))
+                    nameAstock = cur.fetchall()#书名和库存
+                    self.Bstock.append(nameAstock[0])
+                flag = True
+                for i in range(len(self.order_shopInfo)):
+                    if self.Bstock[i][1] - self.order_shopInfo[i][1] < 0:#库存-购物数，判断库存是否足够
+                        showwarning('提醒','%s库存不足'%self.Bstock[i][0].encode('utf-8'))
+                        flag = False #库存不足
+                if flag:
+                    #如果库存充足，则读取当前用户信息的姓名，手机，地址，邮编
+                    #读取cid与当前用户一致的收货人信息，一一比较
+                    cur.execute("select Creal,Cnumber,Caddress,Cpost from customer where Cid = %d"%self.Cid)
+                    current_UserInfo = cur.fetchall()#获取用户当前信息
+                    cur.execute("select Rname,Rnum,Raddress,Rpost from receve where Cid = %d"%self.Cid)
+                    ReceveInfo = cur.fetchall()#获取用户已有收货地址
+                    if current_UserInfo[0] in ReceveInfo:#判断当前信息是否在收货地址中
+                        comm = "select Rid from receve where Cid = %d and Rname = '%s' and Rnum = '%s' and " \
+                               "Raddress = '%s' and Rpost = %d"%(self.Cid,str(current_UserInfo[0][0].encode('utf-8')),str(current_UserInfo[0][1].encode('utf-8'))
+                                                                    ,str(current_UserInfo[0][2].encode('utf-8')),current_UserInfo[0][3])
+                        cur.execute(comm)
+                        Rid = cur.fetchall()
+                        for i in self.generate_orderInfo(Rid[0][0]):
+                            cur.execute(i)      #插入订单表
+                        cur.execute('delete from shopping where Cid = %d'%self.Cid)
+                        conn.commit()
+                        showinfo('提示','下单成功')
+                    else:
+                        #如果当前用户信息不在收货人列表，则生成新的收货人
+                        Rid = len(ReceveInfo)+1
+                        comm = "insert into receve values (%d,%d,'%s','%s','%s',%d)" \
+                               %(Rid,self.Cid, str(current_UserInfo[0][0].encode('utf-8'))
+                                                    , str(current_UserInfo[0][1].encode('utf-8'))
+                                                    , str(current_UserInfo[0][2].encode('utf-8'))
+                                                    , current_UserInfo[0][3])
+                        for i in self.generate_orderInfo(Rid):
+                            cur.execute(i)      #插入订单表，这里没有判断库存的问题
+                        conn.commit()
+                        showinfo('提示','下单成功')
+        else:
+            showerror('错误','你的购物车为空')
 
     def event_editUserInfo(self):
         '''
