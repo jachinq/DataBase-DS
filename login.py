@@ -1,12 +1,6 @@
 #-*- coding:utf-8 -*-
 
-import main
-
-from PIL import Image,ImageTk
-import Tkinter as tk
-from ttk import *
-import tkinter.messagebox
-
+from HeadFile import *
 
 d = {}
 class Application_ui(Frame):
@@ -109,7 +103,6 @@ class Application_ui(Frame):
                                     , font=('幼圆', 14, 'bold'), relief='groove',fg = 'blue')
         self.b_register.place(relx=0.17, rely=0.255, relwidth=0.15, relheight=0.09)
 
-
 class Application(Application_ui):
     #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
     def __init__(self, master=None):
@@ -127,9 +120,9 @@ class Application(Application_ui):
         else:
             tkinter.messagebox.showerror('错误', '账户名或密码错误')
 
-if __name__ == "__main__":
-    top = tk.Tk()
-    Application(top)
+
+top = tk.Tk()
+Application(top)
 
 
 ##########################################

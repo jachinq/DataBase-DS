@@ -4,14 +4,7 @@ This is a scrpit for ...
 Author: Jachin
 Data: 2317- 11- 
 '''
-import tkinter as tk
-from tkinter.ttk import *
-from PIL import Image,ImageTk
-from tkinter.messagebox import *
-import re
-import time
-import pymssql
-
+from HeadFile import *
 
 class User(Frame):
     def __init__(self,top = None):
@@ -441,11 +434,11 @@ class User(Frame):
         #top.withdraw()top.state("zoomed")
         #top.deiconify()
         label_pswd = Label(FrameEditPswd,text = '修改密码',font = 14)
-        label_pswd.place(relx=0.0, rely=0.0, relwidth=0.2, relheight=0.08)
+        label_pswd.place(relx=0.0, rely=0.0, relwidth=0.25, relheight=0.09)
 
         label_orgin = Label(FrameEditPswd,text = '原密码',font = 14)
         label_newpswd = Label(FrameEditPswd,text = '新密码',font = 14)
-        label_repswd = Label(FrameEditPswd,text = '确认密码',font = 14)
+        label_repswd = Label(FrameEditPswd,text = '新密码',font = 14)
         label_orgin.place(relx=0.08, rely=0.2, relwidth=0.2, relheight=0.1)
         label_newpswd.place(relx=0.08, rely=0.4, relwidth=0.2, relheight=0.1)
         label_repswd.place(relx=0.08, rely=0.6, relwidth=0.2, relheight=0.1)
@@ -458,7 +451,7 @@ class User(Frame):
         entry_repswd.place(relx=0.28, rely=0.6, relwidth=0.6, relheight=0.12)
 
         Line_s = Separator(FrameEditPswd, orient='horizontal', style='Line1.TSeparator')
-        Line_s.place(relx=0.0, rely=0.08, relwidth=1, relheight=0.007)
+        Line_s.place(relx=0.0, rely=0.09, relwidth=1, relheight=0.007)
 
         def RePswd():
             '''
@@ -495,7 +488,7 @@ class User(Frame):
         FrameEditShopO.place(relx=0.35, rely=0.3, relwidth=0.3, relheight=0.3)
 
         label_title = Label(FrameEditShopO, text='修改数量', font=14)
-        label_title.place(relx=0.0, rely=0.0, relwidth=0.4, relheight=0.2)
+        label_title.place(relx=0.0, rely=0.0, relwidth=0.6, relheight=0.2)
 
         entry_shopNum = Entry(FrameEditShopO, font=(u'宋体', 14))
         entry_shopNum.place(relx=0.3, rely=0.35, relwidth=0.4, relheight=0.2)
@@ -553,7 +546,7 @@ class Application(User):
         if self.maxpage < len(self.BookInfo) / 8.0:
             self.num = len(self.BookInfo) % 8
 
-        self.Cid = 70001
+        self.Cid = Cid
 
         User.__init__(self, master)
 
@@ -592,7 +585,6 @@ class Application(User):
 
         cur.execute("select distinct Oid from orderinfo where cid = %d" % self.Cid)
         self.OrderInfo = cur.fetchall()
-        #TODO self.OrderInfo两个订单以上时，改数据
         if self.OrderInfo:
             self.OrderBookInfos = []
             for j in self.OrderInfo:
@@ -601,7 +593,6 @@ class Application(User):
                 cur.execute(comm)
                 self.OrderBookInfo = cur.fetchall()
                 self.OrderBookInfos.append(self.OrderBookInfo)
-            print self.OrderBookInfos
 
             for i in range(len(self.OrderInfo)):
                 root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
