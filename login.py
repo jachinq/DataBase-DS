@@ -168,7 +168,7 @@ class Login_ui(Frame):
         self.b_AdminLogin.place(relx=0.76, rely=0.85, relwidth=0.14, relheight=0.1)
         self.b_AdminLogin = Button(self.FrameUserInfo, text='取消', command=self.cancel_register, style='TButton')
         self.b_AdminLogin.place(relx=0.5, rely=0.85, relwidth=0.14, relheight=0.1)
-        
+
 class Application(Login_ui):
     def __init__(self, master=None):
         Login_ui.__init__(self, master)
@@ -288,5 +288,4 @@ class Application(Login_ui):
 if __name__ == '__main__':
     login_windows = tk.Tk()
     Application(login_windows)
-
 
