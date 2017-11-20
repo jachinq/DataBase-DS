@@ -47,9 +47,9 @@ class Admin(Frame):
         self.b_order = tk.Button(self.FrameMenu,image = self.ico_order,command = self.b_order
                             , relief='groove')
         self.b_order.grid(column=1,row = 3)
-        self.b_user = tk.Button(self.FrameMenu,image = self.ico_user,command = self.b_user
+        self.b_admin = tk.Button(self.FrameMenu,image = self.ico_user,command = self.b_admin
                            , relief='groove')
-        self.b_user.grid(column=1,row = 4)
+        self.b_admin.grid(column=1,row = 4)
 
     def Page(self):
         '''
@@ -84,6 +84,7 @@ class Admin(Frame):
 
         self.bp = ImageTk.PhotoImage(Image.open(r'ico\pro.png'))
         self.bn = ImageTk.PhotoImage(Image.open(r'ico\next.png'))
+        self.up = ImageTk.PhotoImage(Image.open(r'ico\upload.png'))
 
         self.b_pro = tk.Button(self.FramePage, relief='groove', command=pro,image = self.bp)
         self.b_pro.place(relx=0.88, rely=0.38, relwidth=0.1, relheight=0.1)
@@ -115,7 +116,6 @@ class Admin(Frame):
             self.Btn[i] = tk.Button(self.FramePage,bg = 'white',image = self.Im[i]
                                     ,command = self.Det,relief = 'groove')
 
-
             #位置
             if i < 4:
                 self.Btn[i].place(relx = self.relx[i],rely = 0.05,relwidth = 0.16,relheight = 0.345)
@@ -127,8 +127,8 @@ class Admin(Frame):
             if self.bookpage == self.maxpage and j >= self.num:
                 self.Btn[i].place_forget()
                 self.Lab[i].place_forget()
-        #do = ['do' + str(i) for i in range(8)]
 
+        #按钮事件
         def do0(event):
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 0][0]
         self.Btn[0].bind('<Button-1>', do0)
@@ -154,6 +154,11 @@ class Admin(Frame):
             self.BookInfoISBN = self.BookInfo[8 * self.bookpage + 7][0]
         self.Btn[7].bind('<Button-1>', do7)
 
+
+        #书籍上架
+        button_upload = tk.Button(self.FramePage,image = self.up,relief = 'groove')
+        button_upload.place(relx=0.88, rely=0.18, relwidth=0.1, relheight=0.15)
+
     def Det(self):
         '''
         详情页查看界面设计
@@ -163,7 +168,7 @@ class Admin(Frame):
         style.configure('bookDet.TLabel', relief='flat'
                         , font=(u'幼圆', 12), anchor='center'
                         , background='white',foreground = '#4141CF')
-        style.configure('TButton', background = 'blue',foreground = '#4141CF', font=(u'幼圆', 12), anchor='center')
+        style.configure('TButton', background = 'blue',foreground = 'black', font=(u'幼圆', 12), anchor='center')
         self.FrameNone = tk.LabelFrame(windows_Admin,text = '详情',background = 'white')
         self.FrameNone.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 1,)
 
@@ -230,7 +235,7 @@ class Admin(Frame):
         订单界面设计
         :return: 
         '''
-        self.FrameOrder =  tk.LabelFrame(windows_Admin,text = '订单',background = 'white')
+        self.FrameOrder =  tk.LabelFrame(windows_Admin,text = '订单管理',background = 'white')
         self.FrameOrder.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.87,)
 
         # Treeview组件，6列，显示表头，带垂直滚动条
@@ -318,6 +323,7 @@ class Admin(Frame):
         ysb.pack(side=tk.RIGHT, fill=tk.Y)
         xsb.pack(side=tk.BOTTOM, fill=tk.X)
 
+
         self.btnShowDet = tk.Button(self.FrameSearch, text='查看详情', command=self.SearchToDet, relief='groove')
         self.btnShowDet.place(relx=0.66, rely=0.85, relwidth=0.11, relheight=0.07)
 
@@ -335,72 +341,66 @@ class Admin(Frame):
         FrameStatistics = tk.LabelFrame(self.FrameStatistics)
         FrameStatistics.place(relx=0.2, rely=0.35, relwidth=0.55, relheight=0.6)
 
-    def User(self):
+    def Admin(self):
         '''
         账户个人界面设计
         :return: 
         '''
+        cur.execute("select * from administrator")
+        adminInfo = cur.fetchall()
+        self.text_adminUser = tk.StringVar(value = '%s'%adminInfo[0][1].encode('utf-8').strip())
+        self.text_adminName = tk.StringVar(value = '%s'%adminInfo[0][2])
+        self.text_adminEamil = tk.StringVar(value = '%s'%adminInfo[0][4])
+
         style = Style()
-        style.configure('user.TLabel', anchor='w', font=(u'幼圆', 14), background='white'
+        style.configure('Admin.TLabel', anchor='w', font=(u'幼圆', 14), background='white'
                         , relief='flat', foreground='#4141CF')
 
-        cur.execute('exec pro_getUserInfo %d' % self.Cid)
-        self.userInfo = cur.fetchall()
-        self.userValues = ['userValues' + str(i) for i in range(9)]
-        self.labelname = ['labelUserName', 'labelUserSex','labelUserReal', 'labelUserPost'
-            ,  'labelUserEmail', 'labelUserPhone','labelUserAddress']
-        self.labelshowname = ['账户','性别','姓名','邮编','邮箱','手机','地址']
-        self.entryname = ['entryUserName', 'entryUserSex', 'entryUserReal', 'entryUserPost'
-            , 'entryUserEmail', 'entryUserPhone', 'entryUserAddress']
-
-        for i in range(7):
-            self.userValues[i] = tk.StringVar()
-            self.userValues[i].set(self.userInfo[0][i])
-
-        self.FrameUser =  tk.LabelFrame(windows_Admin,text = '用户',background = '#fff')
+        self.FrameUser =  tk.LabelFrame(windows_Admin,text = '',background = '#fff')
         self.FrameUser.place(relx = 0.13,rely = 0,relheight = 1,relwidth = 0.87)
-        self.userValue = ['userInfo'+str(i) for i in range(7)]
-        for i in range(7):
-            self.labelname[i] = Label(self.FrameUser, text=self.labelshowname[i], style='user.TLabel')
-            self.entryname[i] = tk.Entry(self.FrameUser,state = 'readonly',textvariable = self.userValues[i]
-                                 , font=(u'宋体', 18), relief='solid',fg = 'black')
 
-        self.labelname[0].place(relx=0.2, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.labelname[1].place(relx=0.5, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.labelname[2].place(relx=0.2, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.labelname[3].place(relx=0.5, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.labelname[4].place(relx=0.2, rely=0.35, relwidth=0.148, relheight=0.08)
-        self.labelname[5].place(relx=0.2, rely=0.50, relwidth=0.148, relheight=0.08)
-        self.labelname[6].place(relx=0.2, rely=0.65, relwidth=0.148, relheight=0.08)
+        self.FrameAdmin = tk.LabelFrame(self.FrameUser,text = '')#,background = '#fff')
+        self.FrameAdmin.place(relx=0.2, rely=0.2, relwidth=0.55, relheight=0.6)
 
-        self.entryname[0].place(relx=0.27, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.entryname[1].place(relx=0.57, rely=0.05, relwidth=0.148, relheight=0.08)
-        self.entryname[2].place(relx=0.27, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.entryname[3].place(relx=0.57, rely=0.20, relwidth=0.148, relheight=0.08)
-        self.entryname[4].place(relx=0.27, rely=0.35, relwidth=0.45, relheight=0.08)
-        self.entryname[5].place(relx=0.27, rely=0.50, relwidth=0.45, relheight=0.08)
-        self.entryname[6].place(relx=0.27, rely=0.65, relwidth=0.45, relheight=0.16)
+        label_admin = tk.Label(self.FrameAdmin, text='管理员信息', font=14,anchor  = 'center')
+        label_admin.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.09)
 
+        Line_s = Separator(self.FrameAdmin, orient='horizontal', style='Line1.TSeparator')
+        Line_s.place(relx=0.0, rely=0.09, relwidth=1, relheight=0.007)
 
-        self.btnEditPswd = tk.Button(self.FrameUser, text='修改密码', command=self.EditUserPswd
+        label_adminUser = Label(self.FrameAdmin, text='账号', font=14)
+        label_adminName = Label(self.FrameAdmin, text='名字', font=14)
+        label_adminEamil = Label(self.FrameAdmin, text='邮箱', font=14)
+        label_adminUser.place(relx=0.08, rely=0.2, relwidth=0.2, relheight=0.1)
+        label_adminName.place(relx=0.08, rely=0.4, relwidth=0.2, relheight=0.1)
+        label_adminEamil.place(relx=0.08, rely=0.6, relwidth=0.2, relheight=0.1)
+        entry_adminUser = Entry(self.FrameAdmin,textvariable = self.text_adminUser, font=(u'宋体', 14),state = 'readonly')
+        entry_adminName = Entry(self.FrameAdmin,textvariable = self.text_adminName, font=(u'宋体', 14),state = 'readonly')
+        entry_adminEamil = Entry(self.FrameAdmin,textvariable = self.text_adminEamil, font=(u'宋体', 14),state = 'readonly')
+
+        entry_adminUser.place(relx=0.28, rely=0.2, relwidth=0.6, relheight=0.12)
+        entry_adminName.place(relx=0.28, rely=0.4, relwidth=0.6, relheight=0.12)
+        entry_adminEamil.place(relx=0.28, rely=0.6, relwidth=0.6, relheight=0.12)
+
+        self.btnEditPswd = tk.Button(self.FrameAdmin, text='修改密码', command=self.EditAdminPswd
                                        , relief='groove',font = (u'幼圆',14))
-        self.btnEditUserInfo = tk.Button(self.FrameUser, text='修改信息', command=self.event_editUserInfo
+        self.btnEditUserInfo = tk.Button(self.FrameAdmin, text='修改信息', command=self.event_editUserInfo
                                      , relief='groove',font = (u'幼圆',14))
-        self.btnEditPswd.place(relx=0.32, rely=0.85, relwidth=0.15, relheight=0.07)
-        self.btnEditUserInfo.place(relx=0.52, rely=0.85, relwidth=0.15, relheight=0.07)
+        self.btnEditPswd.place(relx=0.12, rely=0.8, relwidth=0.3, relheight=0.12)
+        self.btnEditUserInfo.place(relx=0.58, rely=0.8, relwidth=0.3, relheight=0.12)
 
-    def EditUserPswd(self):
+    def EditAdminPswd(self):
         '''
         账户个人修改密码时弹出的界面-设计
         :return: 
         '''
         FrameEditPswd = tk.LabelFrame(self.FrameUser)
 
-        FrameEditPswd.place(relx=0.2, rely=0.35, relwidth=0.55, relheight=0.6)
+        FrameEditPswd.place(relx=0.2, rely=0.2, relwidth=0.55, relheight=0.6)
         #windows_Admin.withdraw()windows_Admin.state("zoomed")
         #windows_Admin.deiconify()
-        label_pswd = Label(FrameEditPswd,text = '修改密码',font = 14)
-        label_pswd.place(relx=0.0, rely=0.0, relwidth=0.25, relheight=0.09)
+        label_pswd = tk.Label(FrameEditPswd,text = '修改密码',font = 14,anchor = 'center')
+        label_pswd.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.09)
 
         label_orgin = Label(FrameEditPswd,text = '原密码',font = 14)
         label_newpswd = Label(FrameEditPswd,text = '新密码',font = 14)
@@ -425,14 +425,14 @@ class Admin(Frame):
             全部信息确认无误后提交到数据库
             :return: 
             '''
-            cur.execute('select Cid,Cpswd from customer where Cid = %d'% self.Cid)
+            cur.execute('select Apswd from administrator')
             #conn.commit()
             userPswd = cur.fetchall()
-            if entry_orgin.get() != userPswd[0][1]:
+            if entry_orgin.get() != userPswd[0][0]:
                 showerror('Error','原密码错误')
             elif entry_newpswd.get()==entry_repswd.get():
                 if entry_newpswd.get()!='':
-                    comm = "update customer set Cpswd = '%s' where cid = %d"%(entry_repswd.get(),self.Cid)
+                    comm = "update administrator set Apswd = '%s'"%(entry_repswd.get())
                     cur.execute(comm)
                     conn.commit()
                     FrameEditPswd.destroy()
@@ -513,22 +513,25 @@ class Application(Admin):
         else:
             self.libox_OrderInfo.insert('', 'end', text=['你还没有下过订单'])
 
-    def b_user(self, event=None):
-        #TODO 用户个人界面
-        pass
-        self.User()
+    def b_admin(self, event=None):
+        #TODO 管理员界面
+        self.Admin()
 
     def SearchToDet(self):
         '''
         从搜索结果打开书籍详情页
         :return: 
         '''
-        list_box_bookname = self.libox_bookInfo.item(self.libox_bookInfo.focus(), "values")[0]
-        for i in self.BookInfo:
-            if list_box_bookname == i[1]:
-                self.BookInfoISBN = i[0]
-                break
-        self.Det()
+        try:
+            list_box_bookname = self.libox_bookInfo.item(self.libox_bookInfo.focus(), "values")[0]
+            for i in self.BookInfo:
+                if list_box_bookname == i[1]:
+                    self.BookInfoISBN = i[0]
+                    break
+            self.Det()
+
+        except:
+            showwarning('提醒', '没有选择的项目')
 
     def event_search(self):
         '''
