@@ -74,6 +74,7 @@ class Admin(Frame):
         self.Lab = ['l_name' + str(i) for i in range(8)]
         self.Im = ['im' + str(i) for i in range(8)]
         self.relx = [0.05, 0.26, 0.47, 0.68]
+
         style = Style()
         style.configure('book.TLabel', relief='flat'
                                 ,wraplength = 100,justify = 'center'
@@ -86,6 +87,7 @@ class Admin(Frame):
         self.bp = ImageTk.PhotoImage(Image.open(r'ico\pro.png'))
         self.bn = ImageTk.PhotoImage(Image.open(r'ico\next.png'))
         self.up = ImageTk.PhotoImage(Image.open(r'ico\upload.png'))
+        self.imNone = ImageTk.PhotoImage(Image.open(r'ico\none.png'))
 
         self.b_pro = tk.Button(self.FramePage, relief='groove', command=pro,image = self.bp)
         self.b_pro.place(relx=0.88, rely=0.38, relwidth=0.1, relheight=0.1)
@@ -110,8 +112,10 @@ class Admin(Frame):
             elif self.bookpage == self.maxpage and j >= self.num:
                 self.path = r"ico\none.png"
                 self.Lab[i] = Label(self.FramePage, text='',anchor='n')
-
-            self.Im[i] = ImageTk.PhotoImage(Image.open(self.path))
+            try:
+                self.Im[i] = ImageTk.PhotoImage(Image.open(self.path))
+            except:
+                self.Im[i] = ImageTk.PhotoImage(Image.open(r'ico\none.png'))
             self.Btn[i] = tk.Button(self.FramePage,bg = 'white',image = self.Im[i]
                                     ,command = self.Det,relief = 'groove')
 
@@ -782,8 +786,20 @@ class Application(Admin):
         self.btn_EditStock.configure(text = '确认修改',command = modifys)
 
     def removeBook(self):
-        #TODO 书籍下架
-        print '书籍下架'
+        '''书籍下架功能'''
+        #对下架操作进行确认
+        if 'yes' == askquestion('提醒','确定下架%s?'%self.Text_list[0].get()):
+
+            #获取详细页书籍的ISBN
+            comm = "delete from book where ISBN = '%s'"%self.Text_list[3].get()
+            try:
+                cur.execute(comm)
+                conn.commit()
+                showinfo('提示','下架成功')
+            except:
+                showerror('糟糕','下架失败')
+        else:
+            showinfo('提示','你取消了操作')
 
     def justfyBookInfo(self):
         '''检测上架书籍信息的格式'''

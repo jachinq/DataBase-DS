@@ -109,8 +109,10 @@ class User(Frame):
             elif self.bookpage == self.maxpage and j >= self.num:
                 self.path = r"ico\none.png"
                 self.Lab[i] = Label(self.FramePage, text='',anchor='n')
-
-            self.Im[i] = ImageTk.PhotoImage(Image.open(self.path))
+            try:
+                self.Im[i] = ImageTk.PhotoImage(Image.open(self.path))
+            except:
+                self.Im[i] = ImageTk.PhotoImage(Image.open(r'ico\none.png'))
             self.Btn[i] = tk.Button(self.FramePage,bg = 'white',image = self.Im[i]
                                     ,command = self.Det,relief = 'groove')
 
