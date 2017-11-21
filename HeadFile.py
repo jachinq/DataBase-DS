@@ -12,7 +12,6 @@ import re
 import time
 import pymssql
 
-
 conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
                            , database='BookStore', charset="utf8")
 

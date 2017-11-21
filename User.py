@@ -2,7 +2,7 @@
 '''
 This is a scrpit for ...
 Author: Jachin
-Data: 2317- 11- 
+Data: 2017- 11- 11
 '''
 from HeadFile import *
 

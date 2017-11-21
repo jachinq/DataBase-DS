@@ -2,14 +2,13 @@
 '''
 This is a scrpit for ...
 Author: Jachin
-Data: 2317- 11- 
+Data: 2017- 11- 19
 '''
 from HeadFile import *
 
 class Admin(Frame):
     def __init__(self,windows_Admin = None):
         Frame.__init__(self,windows_Admin)
-        #windows_Admin = tk.Tk()
         windows_Admin.title('Admin')
         windows_Admin.geometry("740x458+230+100")
         windows_Admin.resizable(0,0)
@@ -374,13 +373,13 @@ class Admin(Frame):
         label_adminUser.place(relx=0.08, rely=0.2, relwidth=0.2, relheight=0.1)
         label_adminName.place(relx=0.08, rely=0.4, relwidth=0.2, relheight=0.1)
         label_adminEamil.place(relx=0.08, rely=0.6, relwidth=0.2, relheight=0.1)
-        entry_adminUser = Entry(self.FrameAdmin,textvariable = self.text_adminUser, font=(u'宋体', 14),state = 'readonly')
-        entry_adminName = Entry(self.FrameAdmin,textvariable = self.text_adminName, font=(u'宋体', 14),state = 'readonly')
-        entry_adminEamil = Entry(self.FrameAdmin,textvariable = self.text_adminEamil, font=(u'宋体', 14),state = 'readonly')
+        self.entry_adminUser = Entry(self.FrameAdmin,textvariable = self.text_adminUser, font=(u'宋体', 14),state = 'readonly')
+        self.entry_adminName = Entry(self.FrameAdmin,textvariable = self.text_adminName, font=(u'宋体', 14),state = 'readonly')
+        self.entry_adminEamil = Entry(self.FrameAdmin,textvariable = self.text_adminEamil, font=(u'宋体', 14),state = 'readonly')
 
-        entry_adminUser.place(relx=0.28, rely=0.2, relwidth=0.6, relheight=0.12)
-        entry_adminName.place(relx=0.28, rely=0.4, relwidth=0.6, relheight=0.12)
-        entry_adminEamil.place(relx=0.28, rely=0.6, relwidth=0.6, relheight=0.12)
+        self.entry_adminUser.place(relx=0.28, rely=0.2, relwidth=0.6, relheight=0.12)
+        self.entry_adminName.place(relx=0.28, rely=0.4, relwidth=0.6, relheight=0.12)
+        self.entry_adminEamil.place(relx=0.28, rely=0.6, relwidth=0.6, relheight=0.12)
 
         self.btnEditPswd = tk.Button(self.FrameAdmin, text='修改密码', command=self.EditAdminPswd
                                        , relief='groove',font = (u'幼圆',14))
@@ -626,65 +625,52 @@ class Application(Admin):
         编辑用户信息，将文本框设置为普通模式
         将按钮文本显示为确认
         '''
-        for i in range(7):
-            self.entryname[i].configure(state = 'normal')
+        self.entry_adminUser.configure(state = 'normal')
+        self.entry_adminName.configure(state = 'normal')
+        self.entry_adminEamil.configure(state = 'normal')
         self.btnEditUserInfo.configure(text = '确认',command = self.event_confirm)
 
     def event_confirm(self):
         ''' 
-        确认用户修改信息,将模式设置为不可用
+        确认管理员修改信息,将模式设置为不可用
         读取文本框的数据，写回数据库，并提示完成修改
         '''
-        for i in range(7):
-            self.userValues[i] = self.entryname[i].get()
-        self.justy_userInfo()
-        if self.userInfoFlag:
-            for i in range(7):
-                self.entryname[i].configure(state='readonly')
+        self.adminInfo = []
+        self.adminInfo.append(str(self.entry_adminUser.get().encode('utf-8')))
+        self.adminInfo.append(self.entry_adminName.get())
+        self.adminInfo.append(self.entry_adminEamil.get())
+        print self.adminInfo
+        self.justy_adminInfo()
+        if self.adminInfoFlag:
+            self.entry_adminUser.configure(state='readonly')
+            self.entry_adminName.configure(state='readonly')
+            self.entry_adminEamil.configure(state='readonly')
 
             self.btnEditUserInfo.configure(text = '修改信息',command = self.event_editUserInfo)
-            comm = "update customer set Cuser='%s',Csex='%s',Creal='%s',Cpost=%d,Cemail='%s',Cnumber='%s',Caddress='%s' where cid = %d"%(
-                self.userValues[0],self.userValues[1],self.userValues[2],int(self.userValues[3])
-                     ,self.userValues[4],self.userValues[5],self.userValues[6]
-                ,self.Cid)
+            comm = "update administrator set Auser='%s',Aname='%s',Aemail='%s'"%(
+                self.adminInfo[0],self.adminInfo[1],self.adminInfo[2])
             comm = str(comm.encode('utf-8'))
             cur.execute(comm)
             conn.commit()
             showinfo('提示', '修改成功')
 
-    def justy_userInfo(self):
+    def justy_adminInfo(self):
         '''
-        判断用户填写信息是否正确
+        判断管理员填写信息是否正确
         :return: 
         '''
-        self.userInfoFlag = True
-        if not self.userValues[0].isalnum():
+        self.adminInfoFlag = True
+        if not self.adminInfo[0].isalnum():
             showerror('错误', '账号只能由字母和数字组成')
-            self.userInfoFlag = False
+            self.adminInfoFlag = False
 
-        if self.userValues[1] not in [u'男',u'女']:
-            showerror('错误', '性别只能为\'男\'或\'女\'')
-            self.userInfoFlag = False
+        if '' == self.adminInfo[1]:
+            showerror('错误', '名字不能为空')
+            self.adminInfoFlag = False
 
-        if '' == self.userValues[2]:
-            showerror('错误', '姓名不能为空')
-            self.userInfoFlag = False
-
-        if not self.userValues[3].isdigit() or len(self.userValues[3]) != 6:
-            showerror('错误', '邮编格式错误')
-            self.userInfoFlag = False
-
-        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", self.userValues[4]) == None:
+        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", self.adminInfo[2]) == None:
             showerror('错误', 'Email格式错误')
-            self.userInfoFlag = False
-
-        if not self.userValues[5].isdigit() or len(self.userValues[5]) != 11:
-            showerror('错误', '手机号格式错误')
-            self.userInfoFlag = False
-
-        if '' == self.userValues[6]:
-            showerror('错误', '地址不能为空')
-            self.userInfoFlag = False
+            self.adminInfoFlag = False
 
 windows_Admin = tk.Tk()
 Application(windows_Admin)
