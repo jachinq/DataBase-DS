@@ -342,7 +342,7 @@ class Admin(Frame):
         self.FrameStatistics.place(relx = 0.13,rely = 0,relwidth = 0.87,relheight = 1,)
 
         FrameStatistics = tk.LabelFrame(self.FrameStatistics)
-        FrameStatistics.place(relx=0.2, rely=0.15, relwidth=0.55, relheight=0.8)
+        FrameStatistics.place(relx=0.2, rely=0.1, relwidth=0.55, relheight=0.8)
 
     def Admin(self):
         '''
