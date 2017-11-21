@@ -92,8 +92,6 @@ class Admin(Frame):
         self.b_next = tk.Button(self.FramePage, relief='groove', command=nex,image = self.bn)
         self.b_next.place(relx=0.88, rely=0.48, relwidth=0.1, relheight=0.1)
 
-
-
         j = -1
         for i in range(8):
             if j < self.num:
@@ -155,7 +153,7 @@ class Admin(Frame):
 
 
         #书籍上架
-        button_upload = tk.Button(self.FramePage,image = self.up,relief = 'groove')
+        button_upload = tk.Button(self.FramePage,image = self.up,relief = 'groove',command = self.addBook)
         button_upload.place(relx=0.88, rely=0.18, relwidth=0.1, relheight=0.15)
 
     def Det(self):
@@ -190,7 +188,6 @@ class Admin(Frame):
         Lab_list = ['lab_name' + str(i) for i in range(6)]
         Lab_name = ['书名','作者','出版社','ISBN','价格','库存']
 
-
         for i in range(6):
             self.bookValues[i] = tk.StringVar(value = '%s'%self.BookDetInfo[0][i])
 
@@ -199,6 +196,7 @@ class Admin(Frame):
                  ,font = (14),justify = 'center',state = 'readonly')
             Lab_list[i] = Label(self.FrameDet, text=Lab_name[i], style='bookDet.TLabel')
 
+        #0书名 1作者 2出版社 3ISBN 4价格 5库存
         self.Text_list[0].place(relx=0.37, rely=0.07, relwidth=0.5, relheight=0.06)
         self.Text_list[1].place(relx=0.18, rely=0.3, relwidth=0.7, relheight=0.06)
         self.Text_list[2].place(relx=0.18, rely=0.4, relwidth=0.7, relheight=0.06)
@@ -213,13 +211,13 @@ class Admin(Frame):
         Lab_list[4].place(relx=0.06, rely=0.60, relwidth=0.1, relheight=0.06)
         Lab_list[5].place(relx=0.07, rely=0.7, relwidth=0.1, relheight=0.06)
 
-        self.btn_EditPrice = Button(self.FrameDet, text='修改价格', command=Back, style='TButton')
+        self.btn_EditPrice = Button(self.FrameDet, text='修改价格', command=self.modifyPrice, style='TButton')
         self.btn_EditPrice.place(relx=0.70, rely=0.6, relwidth=0.18, relheight=0.06)
 
-        self.btn_EditStock = Button(self.FrameDet, text='修改库存', command=Back, style='TButton')
+        self.btn_EditStock = Button(self.FrameDet, text='修改库存', command=self.modifyStock, style='TButton')
         self.btn_EditStock.place(relx=0.70, rely=0.7, relwidth=0.18, relheight=0.06)
 
-        self.btn_Down = Button(self.FrameDet, text='下架', command=Back, style='TButton')
+        self.btn_Down = Button(self.FrameDet, text='下架', command=self.removeBook, style='TButton')
         self.btn_Down.place(relx=0.37, rely=0.80, relwidth=0.12, relheight=0.08)
 
         self.btn_Back = Button(self.FrameDet, text='返回', command=Back, style='TButton')
@@ -338,11 +336,11 @@ class Admin(Frame):
         self.FrameStatistics.place(relx = 0.13,rely = 0,relwidth = 0.87,relheight = 1,)
 
         FrameStatistics = tk.LabelFrame(self.FrameStatistics)
-        FrameStatistics.place(relx=0.2, rely=0.35, relwidth=0.55, relheight=0.6)
+        FrameStatistics.place(relx=0.2, rely=0.15, relwidth=0.55, relheight=0.8)
 
     def Admin(self):
         '''
-        账户个人界面设计
+        管理员界面设计
         :return: 
         '''
         cur.execute("select * from administrator")
@@ -383,7 +381,7 @@ class Admin(Frame):
 
         self.btnEditPswd = tk.Button(self.FrameAdmin, text='修改密码', command=self.EditAdminPswd
                                        , relief='groove',font = (u'幼圆',14))
-        self.btnEditUserInfo = tk.Button(self.FrameAdmin, text='修改信息', command=self.event_editUserInfo
+        self.btnEditUserInfo = tk.Button(self.FrameAdmin, text='修改信息', command=self.event_editAdminInfo
                                      , relief='groove',font = (u'幼圆',14))
         self.btnEditPswd.place(relx=0.12, rely=0.8, relwidth=0.3, relheight=0.12)
         self.btnEditUserInfo.place(relx=0.58, rely=0.8, relwidth=0.3, relheight=0.12)
@@ -466,17 +464,17 @@ class Application(Admin):
         Admin.__init__(self, master)
 
     def b_book(self, event=None):
-        #TODO 书籍页面
+        '''书籍页面'''
         pass
         self.Page()
 
     def b_search(self, event=None):
-        #TODO 搜索界面
+        '''搜索界面'''
         pass
         self.Search()
 
     def b_statistics(self, event=None):
-        #TODO 搜索界面
+        '''统计界面'''
         pass
         self.Statistics()
 
@@ -513,7 +511,7 @@ class Application(Admin):
             self.libox_OrderInfo.insert('', 'end', text=['你还没有下过订单'])
 
     def b_admin(self, event=None):
-        #TODO 管理员界面
+        '''管理员界面'''
         self.Admin()
 
     def SearchToDet(self):
@@ -620,7 +618,7 @@ class Application(Admin):
         else:
             showerror('错误','你的购物车为空')
 
-    def event_editUserInfo(self):
+    def event_editAdminInfo(self):
         '''
         编辑用户信息，将文本框设置为普通模式
         将按钮文本显示为确认
@@ -635,24 +633,28 @@ class Application(Admin):
         确认管理员修改信息,将模式设置为不可用
         读取文本框的数据，写回数据库，并提示完成修改
         '''
+        #把三个文本框的内容添加到adminInfo列表中
         self.adminInfo = []
         self.adminInfo.append(str(self.entry_adminUser.get().encode('utf-8')))
         self.adminInfo.append(self.entry_adminName.get())
         self.adminInfo.append(self.entry_adminEamil.get())
-        print self.adminInfo
+        #判断信息填写格式
         self.justy_adminInfo()
         if self.adminInfoFlag:
             self.entry_adminUser.configure(state='readonly')
             self.entry_adminName.configure(state='readonly')
             self.entry_adminEamil.configure(state='readonly')
 
-            self.btnEditUserInfo.configure(text = '修改信息',command = self.event_editUserInfo)
+            self.btnEditUserInfo.configure(text = '修改信息',command = self.event_editAdminInfo)
             comm = "update administrator set Auser='%s',Aname='%s',Aemail='%s'"%(
                 self.adminInfo[0],self.adminInfo[1],self.adminInfo[2])
             comm = str(comm.encode('utf-8'))
-            cur.execute(comm)
-            conn.commit()
-            showinfo('提示', '修改成功')
+            try:
+                cur.execute(comm)
+                conn.commit()
+                showinfo('提示', '修改成功')
+            except:
+                showerror('糟糕','修改失败')
 
     def justy_adminInfo(self):
         '''
@@ -671,6 +673,55 @@ class Application(Admin):
         if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", self.adminInfo[2]) == None:
             showerror('错误', 'Email格式错误')
             self.adminInfoFlag = False
+
+    def modifyPrice(self):
+        #TODO 修改价格功能，这部分涉及到触发器。先放一放
+        #定义事件
+        #点击确认修改后，验证数据格式，提交到数据库，控件模式改变
+        def modifyp():
+            #step 1 验证数据正确性，价格不能<0.格式为 __.__元
+            print '价格修改成功'
+            self.Text_list[4].configure(state = 'readonly')
+            self.btn_EditPrice.configure(text = '修改价格',command = self.modifyPrice)
+
+        #正式部分，将文本框模式改为可用，修改按钮文字和绑定的事件
+        self.Text_list[4].configure(state = 'normal')
+        self.btn_EditPrice.configure(text = '确认修改',command = modifyp)
+
+    def modifyStock(self):
+        #TODO 修改库存
+        #定义事件
+        #点击确认修改后，验证数据格式，提交到数据库，控件模式改变
+        def modifys():
+            #step 1 验证数据格式，只能为整数且不能<0,使用isdigit()函数其实杜绝了输入小于0的情况，因为不能输入负号233
+            if str(self.Text_list[5].get().encode('utf-8')).isdigit():
+                #step 2 提交修改到数据库
+                ISBN = self.Text_list[3].get()
+                comm = "update book set Bstock = %d where ISBN = '%s'"%(int(self.Text_list[5].get()),ISBN)
+                comm = comm.encode('utf-8')
+                try:
+                    cur.execute(comm)
+                    conn.commit()
+                    showinfo('提示','修改成功')
+                    self.Text_list[5].configure(state = 'readonly')
+                    self.btn_EditStock.configure(text='修改库存', command=self.modifyStock)
+                except:
+                    showerror('糟糕','无法修改')
+            else:
+                showwarning('提醒','库存只能为整数&不能小于 0 ')
+
+        #正式部分。修改文本框为可用。修改按钮文字和绑定的事件
+        self.Text_list[5].configure(state = 'normal')
+        self.btn_EditStock.configure(text = '确认修改',command = modifys)
+
+    def removeBook(self):
+        #TODO 书籍下架
+        print '书籍下架'
+
+    def addBook(self):
+        #TODO 书籍上架
+        pass
+        print '上架成功'
 
 windows_Admin = tk.Tk()
 Application(windows_Admin)
