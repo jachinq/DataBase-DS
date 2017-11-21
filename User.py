@@ -711,9 +711,10 @@ class Application(User):
         return comms
 
     def event_addToOrder(self):
-        #TODO 下单后库存数量的修改
-        pass
-
+        '''
+        用户下单后清空购物车，并更新书籍的库存
+        :return: 
+        '''
         cur.execute('select ISBN,Ocount,price from shopping where Cid = %d'%self.Cid)
         self.order_shopInfo = cur.fetchall()
         if self.order_shopInfo:

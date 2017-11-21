@@ -50,6 +50,8 @@ class Admin(Frame):
                            , relief='groove')
         self.b_admin.grid(column=1,row = 4)
 
+        self.Page()
+        
     def Page(self):
         '''
         图书浏览主界面设计，包括翻页浏览
@@ -331,7 +333,7 @@ class Admin(Frame):
         统计界面-设计
         :return: 
         '''
-
+        #TODO 统计页面设计及相应的功能
         self.FrameStatistics =  tk.LabelFrame(windows_Admin,background = 'white',text='统计')
         self.FrameStatistics.place(relx = 0.13,rely = 0,relwidth = 0.87,relheight = 1,)
 
@@ -444,7 +446,67 @@ class Admin(Frame):
 
     def addBook(self):
         #TODO 图书上架界面
-        pass
+        style = Style()
+        style.configure('bookDet.TLabel', relief='flat'
+                        , font=(u'幼圆', 12), anchor='center'
+                        , background='white', foreground='#4141CF')
+        style.configure('TButton', relief='flat', font=(u'幼圆', 12), anchor='center')
+        self.FrameNone = tk.LabelFrame(windows_Admin, text='上架', background='white')
+        self.FrameNone.place(relx=0.13, rely=0, relheight=1, relwidth=1, )
+
+        self.FrameAdd = tk.LabelFrame(self.FrameNone, background='white')
+        self.FrameAdd.place(relx=0.145, rely=-0.01, relheight=1, relwidth=0.6, )
+
+        def Back():
+            self.FrameNone.destroy()
+
+        self.btn_addB = Button(self.FrameAdd, text='返回', command=Back, style='TButton')
+        self.btn_addB.place(relx=0.76, rely=0.88, relwidth=0.12, relheight=0.08)
+
+        self.btn_readd = Button(self.FrameAdd, text='确定上架', style='TButton',command = self.event_addBook)
+        self.btn_readd.place(relx=0.5, rely=0.88, relwidth=0.24, relheight=0.08)
+
+        # 图标
+        P_det = tk.Canvas(self.FrameAdd, bg='#FFFFFF')
+        self.im_det = ImageTk.PhotoImage(Image.open(r'ico\det2.png'))
+        P_det.create_image(0.4, 8, anchor='nw', image=self.im_det)
+        P_det.place(relx=0.02, rely=-0.0, relwidth=0.16, relheight=0.18)
+
+        self.BookDetInfo = cur.fetchall()
+        self.Text_listup = ['Text_name' + str(i) for i in range(7)]
+        Lab_list = ['lab_name' + str(i) for i in range(7)]
+        Lab_name = ['书名', '作者', '价格', '出版社', 'ISBN', '简介', '库存']
+
+        for i in range(7):
+            # 文本框，标签和分割线
+            self.Text_listup[i] = tk.Text(self.FrameAdd
+                                        , font=(14), relief='solid')
+            Lab_list[i] = Label(self.FrameAdd, text=Lab_name[i], style='bookDet.TLabel')
+
+        self.Text_listup[0].place(relx=0.37, rely=0.082, relwidth=0.5, relheight=0.06)
+        self.Text_listup[1].place(relx=0.18, rely=0.24, relwidth=0.7, relheight=0.06)
+        self.Text_listup[2].place(relx=0.18, rely=0.42, relwidth=0.25, relheight=0.06)
+        self.Text_listup[3].place(relx=0.18, rely=0.33, relwidth=0.7, relheight=0.06)
+        self.Text_listup[4].place(relx=0.55, rely=0.42, relwidth=0.33, relheight=0.06)
+        self.Text_listup[5].place(relx=0.18, rely=0.5, relwidth=0.7, relheight=0.35)
+        self.Text_listup[6].place(relx=0.18, rely=0.88, relwidth=0.18, relheight=0.06)
+
+        Lab_list[0].place(relx=0.25, rely=0.08, relwidth=0.1, relheight=0.06)
+        Lab_list[1].place(relx=0.06, rely=0.24, relwidth=0.1, relheight=0.06)
+        Lab_list[2].place(relx=0.06, rely=0.42, relwidth=0.1, relheight=0.06)
+        Lab_list[3].place(relx=0.04, rely=0.33, relwidth=0.12, relheight=0.06)
+        Lab_list[4].place(relx=0.45, rely=0.42, relwidth=0.1, relheight=0.06)
+        Lab_list[5].place(relx=0.07, rely=0.5, relwidth=0.1, relheight=0.06)
+        Lab_list[6].place(relx=0.07, rely=0.88, relwidth=0.1, relheight=0.06)
+
+        style.configure('TSeparator')
+        Line1 = Separator(self.FrameAdd, orient='horizontal', style='Line1.TSeparator')
+        Line1.place(relx=0., rely=0.196, relwidth=1, relheight=0.006)
+
+        S = Scrollbar(self.FrameAdd)
+        S.pack(side=tk.RIGHT, fill=tk.Y)
+        S.config(command=self.Text_listup[5].yview)
+        self.Text_listup[5].config(yscrollcommand=S.set)
 
 
 class Application(Admin):
@@ -723,10 +785,54 @@ class Application(Admin):
         #TODO 书籍下架
         print '书籍下架'
 
+    def justfyBookInfo(self):
+        '''检测上架书籍信息的格式'''
+        flag_book = True
+        if '' == self.Text_listup[0].get("0.0","end").encode('utf-8').strip():
+            showerror('错误','书名不能为空')
+            flag_book = False
+        if '' == self.Text_listup[1].get("0.0","end").encode('utf-8').strip():
+            showerror('错误','作者不能为空')
+            flag_book = False
+        #价格
+        reg = r'[0-9]{1,}.\d{2}元'
+        res = re.match(reg, str(self.Text_listup[2].get("0.0","end").encode('utf-8').strip()))
+        if not res:
+            showerror('错误','价格格式错误')
+            flag_book = False
+        if '' == self.Text_listup[3].get("0.0","end").encode('utf-8').strip():
+            showerror('错误','出版社不能为空')
+            flag_book = False
+        #ISBN
+        if not str(self.Text_listup[4].get("0.0","end").encode('utf-8').strip()).isdigit() or len(str(self.Text_listup[4].get("0.0","end").encode('utf-8').strip()))!=13:
+            showerror('错误','ISBN格式有误')
+            flag_book = False
+        if '' == self.Text_listup[5].get("0.0","end").encode('utf-8').strip():
+            showerror('错误','简介不能为空')
+            flag_book = False
+        #库存
+        if not str(self.Text_listup[6].get("0.0","end").encode('utf-8').strip()).isdigit():
+            showerror('错误','库存只能为整数')
+            flag_book = False
+        return flag_book
+
     def event_addBook(self):
-        #TODO 书籍上架
-        pass
-        print '上架成功'
+        '''书籍上架'''
+        newBookInfo = []
+        #['0书名', '1作者', '2价格', '3出版社', '4ISBN', '5简介', '6库存']
+        # [ 'ISBN','书名', '作者', '价格', '出版社', '简介', '库存']
+        if self.justfyBookInfo():
+            for i in range(7):
+                newBookInfo.append(self.Text_listup[i].get("0.0","end").encode('utf-8').strip())
+
+            comm = "insert into book values ('%s','%s','%s','%s','%s','%s',%d)"%(newBookInfo[4],newBookInfo[0]
+                            ,newBookInfo[1],newBookInfo[2],newBookInfo[3],newBookInfo[5],int(newBookInfo[6]))
+            try:
+                cur.execute(comm)
+                conn.commit()
+                showinfo('提示','上架成功')
+            except:
+                showerror('糟糕','上架失败')
 
 windows_Admin = tk.Tk()
 Application(windows_Admin)
