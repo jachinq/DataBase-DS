@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-This is a scrpit for ...
+This is a scrpit for 用户
 Author: Jachin
 Data: 2017- 11- 11
 '''
@@ -11,7 +11,7 @@ class User(Frame):
         Frame.__init__(self,top)
         #top = tk.Tk()
         top.title('User')
-        top.geometry("740x458+230+100")
+        top.geometry("740x458+330+150")
         top.resizable(0,0)
         self.Main(top)
         top.mainloop()
@@ -47,6 +47,8 @@ class User(Frame):
         self.b_user = tk.Button(self.FrameMenu,image = self.ico_user,command = self.b_user
                            , relief='groove')
         self.b_user.grid(column=1,row = 4)
+        #如果主界面要显示
+        self.Page()
 
     def Page(self):
         '''
@@ -551,13 +553,13 @@ class Application(User):
         User.__init__(self, master)
 
     def b_book(self, event=None):
-        #TODO 书籍页面
-        pass
+        '''书籍页面
+        '''
         self.Page()
 
     def b_search(self, event=None):
-        #TODO 搜索界面
-        pass
+        '''搜索界面
+        '''
         self.Search()
 
     def b_shopping(self):
@@ -566,8 +568,6 @@ class Application(User):
         :param event: 
         :return: 
         '''
-        #TODO 购物车页面
-        pass
         self.Shopping()
         cur.execute("exec pro_shop %d"%self.Cid)
         self.ShopInfo = cur.fetchall()
@@ -595,14 +595,12 @@ class Application(User):
                 self.OrderBookInfos.append(self.OrderBookInfo)
 
             #查看一个订单下的所有书籍信息
-            print self.OrderBookInfos
+            #print self.OrderBookInfos
 
             for i in range(len(self.OrderInfo)):
                 root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
                 price = 0
-                print len(self.OrderBookInfos)
                 for j in range(len(self.OrderBookInfos[i])):
-                    print j
                     self.libox_OrderInfo.insert(root_node, 'end',
                                                 v=[str(self.OrderBookInfos[i][j][0].encode('utf-8')).strip(),
                                                    self.OrderBookInfos[i][j][1], self.OrderBookInfos[i][j][2]])
@@ -613,14 +611,13 @@ class Application(User):
             self.libox_OrderInfo.insert('', 'end', text=['你还没有下过订单'])
 
     def b_user(self, event=None):
-        #TODO 用户个人界面
-        pass
+        '''用户个人界面
+        '''
         self.User()
 
     def event_addToShop(self):
         '''添加至购物车功能,每次默认添加一本，修改数量要使用购物车页面的编辑数量功能
         '''
-        pass
         ISBN = str(self.Text_list[4].get("1.0","12.0"))
         price = float(self.Text_list[2].get("1.0","16.0")[0:-2])
         Ocount = 1
@@ -638,8 +635,8 @@ class Application(User):
             showinfo('提示','添加成功！')
 
     def event_editOcount(self):
-        #TODO 编辑购物车书籍数量
-        pass
+        '''编辑购物车书籍数量
+        '''
 
         if self.libox_ShopInfo.focus():
             self.btnSettlement.configure(state = 'disable')
@@ -650,7 +647,7 @@ class Application(User):
             showwarning('警告','选择要修改的项目')
 
     def event_removeFromShop(self):
-        #TODO 将书籍移出购物车
+        '''将书籍移出购物车'''
         if self.libox_ShopInfo.focus():
             list_bookName = ''
             list_box_bookname = self.libox_ShopInfo.item(self.libox_ShopInfo.focus(), "values")[0]  # 保存选中的书的ISBN
@@ -716,8 +713,9 @@ class Application(User):
         return comms
 
     def event_addToOrder(self):
-        #TODO 把购物车的书籍清空，生成相应的的订单
+        #TODO 下单后库存数量的修改
         pass
+
         cur.execute('select ISBN,Ocount,price from shopping where Cid = %d'%self.Cid)
         self.order_shopInfo = cur.fetchall()
         if self.order_shopInfo:
@@ -755,14 +753,21 @@ class Application(User):
                         showinfo('提示','下单成功')
                     else:
                         #如果当前用户信息不在收货人列表，则生成新的收货人
-                        Rid = len(ReceveInfo)+1
+                        cur.execute("select * from Receve")
+                        Revece_length = cur.fetchall()
+                        Rid = len(Revece_length)+1
                         comm = "insert into receve values (%d,%d,'%s','%s','%s',%d)" \
                                %(Rid,self.Cid, str(current_UserInfo[0][0].encode('utf-8'))
                                                     , str(current_UserInfo[0][1].encode('utf-8'))
                                                     , str(current_UserInfo[0][2].encode('utf-8'))
                                                     , current_UserInfo[0][3])
+                        print comm
+                        print type(comm)
+                        cur.execute(comm)
+                        conn.commit()
                         for i in self.generate_orderInfo(Rid):
                             cur.execute(i)      #插入订单表，这里没有判断库存的问题
+                        cur.execute('delete from shopping where Cid = %d'%self.Cid)
                         conn.commit()
                         showinfo('提示','下单成功')
         else:

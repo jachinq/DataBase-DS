@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-This is a scrpit for ...
+This is a scrpit for 管理员
 Author: Jachin
 Data: 2017- 11- 19
 '''
@@ -10,7 +10,7 @@ class Admin(Frame):
     def __init__(self,windows_Admin = None):
         Frame.__init__(self,windows_Admin)
         windows_Admin.title('Admin')
-        windows_Admin.geometry("740x458+230+100")
+        windows_Admin.geometry("740x458+330+150")
         windows_Admin.resizable(0,0)
         self.Main(windows_Admin)
         windows_Admin.mainloop()
