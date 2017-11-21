@@ -442,6 +442,11 @@ class Admin(Frame):
         btnEditUserInfo = tk.Button(FrameEditPswd,text='确认修改',command=RePswd,relief='groove',font=(u'幼圆', 14))
         btnEditUserInfo.place(relx=0.58, rely=0.8, relwidth=0.3, relheight=0.12)
 
+    def addBook(self):
+        #TODO 图书上架界面
+        pass
+
+
 class Application(Admin):
     #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
     def __init__(self, master=None):
@@ -689,7 +694,7 @@ class Application(Admin):
         self.btn_EditPrice.configure(text = '确认修改',command = modifyp)
 
     def modifyStock(self):
-        #TODO 修改库存
+        '''修改库存'''
         #定义事件
         #点击确认修改后，验证数据格式，提交到数据库，控件模式改变
         def modifys():
@@ -718,7 +723,7 @@ class Application(Admin):
         #TODO 书籍下架
         print '书籍下架'
 
-    def addBook(self):
+    def event_addBook(self):
         #TODO 书籍上架
         pass
         print '上架成功'

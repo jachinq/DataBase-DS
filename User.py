@@ -594,15 +594,20 @@ class Application(User):
                 self.OrderBookInfo = cur.fetchall()
                 self.OrderBookInfos.append(self.OrderBookInfo)
 
+            #查看一个订单下的所有书籍信息
+            print self.OrderBookInfos
+
             for i in range(len(self.OrderInfo)):
                 root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
                 price = 0
-                for j in range(len(self.OrderBookInfos)):
+                print len(self.OrderBookInfos)
+                for j in range(len(self.OrderBookInfos[i])):
+                    print j
                     self.libox_OrderInfo.insert(root_node, 'end',
                                                 v=[str(self.OrderBookInfos[i][j][0].encode('utf-8')).strip(),
                                                    self.OrderBookInfos[i][j][1], self.OrderBookInfos[i][j][2]])
                     price += int(self.OrderBookInfos[i][j][2])
-                self.libox_OrderInfo.insert(root_node, 'end', v=['', '', '', price])
+                self.libox_OrderInfo.insert(root_node, 'end', v=['','','', price])
 
         else:
             self.libox_OrderInfo.insert('', 'end', text=['你还没有下过订单'])
