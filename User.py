@@ -701,8 +701,6 @@ class Application(User):
         Oid = t[3:7] + time.strftime("%Y%m%d%H", time.localtime())[1:-2] + str(self.Cid) + t[7:10]
         date = time.strftime("%Y-%m-%d", time.localtime())
         for i in self.order_shopInfo:
-            print i[0].encode('utf-8')
-            print type(i[0].encode('utf-8'))
             cur.execute("select Bname from book where ISBN = '%s'"%(i[0].encode('utf-8')))
             Bname = cur.fetchall()
             Bname = Bname[0][0]
@@ -725,14 +723,16 @@ class Application(User):
                 # 获取库存的数量
                 self.Bstock = []
                 for i in range(len(self.order_shopInfo)):
-                    cur.execute("select Bname,Bstock from book where  ISBN = '%s'"%self.order_shopInfo[i][0].encode('utf-8'))
+                    cur.execute("select Bname,Bstock,ISBN from book where  ISBN = '%s'"%self.order_shopInfo[i][0].encode('utf-8'))
                     nameAstock = cur.fetchall()#书名和库存
                     self.Bstock.append(nameAstock[0])
+
                 flag = True
                 for i in range(len(self.order_shopInfo)):
                     if self.Bstock[i][1] - self.order_shopInfo[i][1] < 0:#库存-购物数，判断库存是否足够
                         showwarning('提醒','%s库存不足'%self.Bstock[i][0].encode('utf-8'))
                         flag = False #库存不足
+
                 if flag:
                     #如果库存充足，则读取当前用户信息的姓名，手机，地址，邮编
                     #读取cid与当前用户一致的收货人信息，一一比较
@@ -747,10 +747,7 @@ class Application(User):
                         cur.execute(comm)
                         Rid = cur.fetchall()
                         for i in self.generate_orderInfo(Rid[0][0]):
-                            cur.execute(i)      #插入订单表
-                        cur.execute('delete from shopping where Cid = %d'%self.Cid)
-                        conn.commit()
-                        showinfo('提示','下单成功')
+                            cur.execute(i)      #插入订单表，这里没有判断库存的问题
                     else:
                         #如果当前用户信息不在收货人列表，则生成新的收货人
                         cur.execute("select * from Receve")
@@ -761,15 +758,21 @@ class Application(User):
                                                     , str(current_UserInfo[0][1].encode('utf-8'))
                                                     , str(current_UserInfo[0][2].encode('utf-8'))
                                                     , current_UserInfo[0][3])
-                        print comm
-                        print type(comm)
                         cur.execute(comm)
                         conn.commit()
                         for i in self.generate_orderInfo(Rid):
                             cur.execute(i)      #插入订单表，这里没有判断库存的问题
-                        cur.execute('delete from shopping where Cid = %d'%self.Cid)
-                        conn.commit()
-                        showinfo('提示','下单成功')
+                    #清空当前用户的购物车
+                    cur.execute('delete from shopping where Cid = %d'%self.Cid)
+                    #重新设置库存的数量
+                    for i in range(len(self.order_shopInfo)):
+                        stock = self.Bstock[i][1] - self.order_shopInfo[i][1]
+                        comm = "update book set Bstock = %d where ISBN = '%s'"%(stock,self.Bstock[i][2].encode('utf-8'))
+                        cur.execute(comm)
+                    #将清空操作和库存更新提交到数据库
+                    conn.commit()
+                    showinfo('提示','下单成功')
+
         else:
             showerror('错误','你的购物车为空')
 
