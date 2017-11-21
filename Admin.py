@@ -449,7 +449,7 @@ class Admin(Frame):
         btnEditUserInfo.place(relx=0.58, rely=0.8, relwidth=0.3, relheight=0.12)
 
     def addBook(self):
-        #TODO 图书上架界面
+        '''图书上架界面'''
         style = Style()
         style.configure('bookDet.TLabel', relief='flat'
                         , font=(u'幼圆', 12), anchor='center'
@@ -512,7 +512,6 @@ class Admin(Frame):
         S.config(command=self.Text_listup[5].yview)
         self.Text_listup[5].config(yscrollcommand=S.set)
 
-
 class Application(Admin):
     #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
     def __init__(self, master=None):
@@ -557,13 +556,12 @@ class Application(Admin):
         '''
         self.Order()
 
-        cur.execute("select distinct Oid from orderinfo where cid = %d" % self.Cid)
+        cur.execute("select distinct Oid from orderinfo")
         self.OrderInfo = cur.fetchall()
         if self.OrderInfo:
             self.OrderBookInfos = []
             for j in self.OrderInfo:
-                comm = "select Bname,Ocount,price from orderinfo where cid = %d and Oid = '%s'" \
-                   % (self.Cid, str(j[0]))
+                comm = "select Bname,Ocount,price from orderinfo where Oid = '%s'"%(str(j[0]))
                 cur.execute(comm)
                 self.OrderBookInfo = cur.fetchall()
                 self.OrderBookInfos.append(self.OrderBookInfo)
@@ -571,7 +569,7 @@ class Application(Admin):
             for i in range(len(self.OrderInfo)):
                 root_node = self.libox_OrderInfo.insert('', 'end', text=[self.OrderInfo[i][0]],open = False)
                 price = 0
-                for j in range(len(self.OrderBookInfos)):
+                for j in range(len(self.OrderBookInfos[i])):
                     self.libox_OrderInfo.insert(root_node, 'end',
                                                 v=[str(self.OrderBookInfos[i][j][0].encode('utf-8')).strip(),
                                                    self.OrderBookInfos[i][j][1], self.OrderBookInfos[i][j][2]])
@@ -636,59 +634,6 @@ class Application(Admin):
             comms.append(comm)
         return comms
 
-    def event_addToOrder(self):
-        #TODO 把购物车的书籍清空，生成相应的的订单
-        pass
-        cur.execute('select ISBN,Ocount,price from shopping where Cid = %d'%self.Cid)
-        self.order_shopInfo = cur.fetchall()
-        if self.order_shopInfo:
-            #如果购物车非空，询问是否确定下单
-            if 'yes' == askquestion('下单', '确定要下单吗?此操作将清空购物车'):
-                #确定则检查购物车书籍数量是否小于库存
-                # 获取库存的数量
-                self.Bstock = []
-                for i in range(len(self.order_shopInfo)):
-                    cur.execute("select Bname,Bstock from book where  ISBN = '%s'"%self.order_shopInfo[i][0].encode('utf-8'))
-                    nameAstock = cur.fetchall()#书名和库存
-                    self.Bstock.append(nameAstock[0])
-                flag = True
-                for i in range(len(self.order_shopInfo)):
-                    if self.Bstock[i][1] - self.order_shopInfo[i][1] < 0:#库存-购物数，判断库存是否足够
-                        showwarning('提醒','%s库存不足'%self.Bstock[i][0].encode('utf-8'))
-                        flag = False #库存不足
-                if flag:
-                    #如果库存充足，则读取当前用户信息的姓名，手机，地址，邮编
-                    #读取cid与当前用户一致的收货人信息，一一比较
-                    cur.execute("select Creal,Cnumber,Caddress,Cpost from customer where Cid = %d"%self.Cid)
-                    current_UserInfo = cur.fetchall()#获取用户当前信息
-                    cur.execute("select Rname,Rnum,Raddress,Rpost from receve where Cid = %d"%self.Cid)
-                    ReceveInfo = cur.fetchall()#获取用户已有收货地址
-                    if current_UserInfo[0] in ReceveInfo:#判断当前信息是否在收货地址中
-                        comm = "select Rid from receve where Cid = %d and Rname = '%s' and Rnum = '%s' and " \
-                               "Raddress = '%s' and Rpost = %d"%(self.Cid,str(current_UserInfo[0][0].encode('utf-8')),str(current_UserInfo[0][1].encode('utf-8'))
-                                                                    ,str(current_UserInfo[0][2].encode('utf-8')),current_UserInfo[0][3])
-                        cur.execute(comm)
-                        Rid = cur.fetchall()
-                        for i in self.generate_orderInfo(Rid[0][0]):
-                            cur.execute(i)      #插入订单表
-                        cur.execute('delete from shopping where Cid = %d'%self.Cid)
-                        conn.commit()
-                        showinfo('提示','下单成功')
-                    else:
-                        #如果当前用户信息不在收货人列表，则生成新的收货人
-                        Rid = len(ReceveInfo)+1
-                        comm = "insert into receve values (%d,%d,'%s','%s','%s',%d)" \
-                               %(Rid,self.Cid, str(current_UserInfo[0][0].encode('utf-8'))
-                                                    , str(current_UserInfo[0][1].encode('utf-8'))
-                                                    , str(current_UserInfo[0][2].encode('utf-8'))
-                                                    , current_UserInfo[0][3])
-                        for i in self.generate_orderInfo(Rid):
-                            cur.execute(i)      #插入订单表，这里没有判断库存的问题
-                        conn.commit()
-                        showinfo('提示','下单成功')
-        else:
-            showerror('错误','你的购物车为空')
-
     def event_editAdminInfo(self):
         '''
         编辑用户信息，将文本框设置为普通模式
@@ -745,15 +690,46 @@ class Application(Admin):
             showerror('错误', 'Email格式错误')
             self.adminInfoFlag = False
 
+    def justfy_price(self):
+        #修改价格时，价格格式的判断
+        flag_price = True
+        reg = r'[0-9]{1,}.[0-9]{2}元'
+        res = re.match(reg, str(self.Text_list[4].get().encode('utf-8')))
+        if not res:
+            showerror('错误', '价格格式错误')
+            flag_price = False
+        return flag_price
+
     def modifyPrice(self):
-        #TODO 修改价格功能，这部分涉及到触发器。先放一放
+        '''修改价格功能，修改成功后更新购物车的总价格'''
         #定义事件
         #点击确认修改后，验证数据格式，提交到数据库，控件模式改变
         def modifyp():
             #step 1 验证数据正确性，价格不能<0.格式为 __.__元
-            print '价格修改成功'
-            self.Text_list[4].configure(state = 'readonly')
-            self.btn_EditPrice.configure(text = '修改价格',command = self.modifyPrice)
+            if self.justfy_price():
+                #命令。更新书籍表的价格，记住，这里的书籍价格格式是__.__元
+                comm_updatebook = "update book set Bprice = '%s' where ISBN = '%s'"%(str(self.Text_list[4].get().encode('utf-8'))
+                                ,str(self.Text_list[3].get().encode('utf-8')))
+                ISBN = str(self.Text_list[3].get().encode('utf-8'))
+                #执行书籍表价格的更新命令。未提交
+                #cur.execute(comm_updatebook)
+                #如果购物车中有要修改价格的书，则获取购物车中的书籍数量，返回的是一个列表
+                comm_selectshop = "select distinct Ocount from shopping where ISBN = '%s'"%(str(self.Text_list[3].get().encode('utf-8')))
+                cur.execute(comm_selectshop)
+                Ocount = cur.fetchall()
+                for i in Ocount:#i[0]是一个int类型数据
+                    #计算得到总价
+                    price = i[0]*float(self.Text_list[4].get().encode('utf-8').strip('元'))#总价price是一个float类型的数据
+                    #命令。更新购物车的价格
+                    comm_updateShop = "update shopping set price = %.2f where ISBN = '%s' and Ocount = %d"%(price,ISBN,i[0])
+                    cur.execute(comm_updateShop)
+                try:
+                    conn.commit()
+                    showinfo('提示','修改成功')
+                    self.Text_list[4].configure(state = 'readonly')
+                    self.btn_EditPrice.configure(text = '修改价格',command = self.modifyPrice)
+                except:
+                    showerror('糟糕','修改失败')
 
         #正式部分，将文本框模式改为可用，修改按钮文字和绑定的事件
         self.Text_list[4].configure(state = 'normal')
@@ -788,7 +764,7 @@ class Application(Admin):
     def removeBook(self):
         '''书籍下架功能'''
         #对下架操作进行确认
-        if 'yes' == askquestion('提醒','确定下架%s?'%self.Text_list[0].get()):
+        if 'yes' == askquestion('提醒','确定下架%s?'%self.Text_list[0].get().encode('utf-8')):
 
             #获取详细页书籍的ISBN
             comm = "delete from book where ISBN = '%s'"%self.Text_list[3].get()
