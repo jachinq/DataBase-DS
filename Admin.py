@@ -338,12 +338,48 @@ class Admin(Frame):
         :return: 
         '''
         #TODO 统计页面设计及相应的功能
+
+        self.style.configure('TSeparator', background='#000000')
+
         self.FrameStatistics =  tk.LabelFrame(windows_Admin,background = 'white',text='统计')
         self.FrameStatistics.place(relx = 0.13,rely = 0,relwidth = 0.87,relheight = 1,)
 
         FrameStatistics = tk.LabelFrame(self.FrameStatistics)
-        FrameStatistics.place(relx=0.2, rely=0.1, relwidth=0.55, relheight=0.8)
+        FrameStatistics.place(relx=0.2, rely=0.08, relwidth=0.55, relheight=0.8)
 
+        label_date = Label(FrameStatistics,text = '按日统计',anchor = 'center',font = 14)
+        label_date.place(relx=0.0, rely=0, relwidth=1, relheight=0.1)
+        line_date = Separator(FrameStatistics,style = 'TSeparator')
+        line_date.place(relx=0.0, rely=0.08, relwidth=1, relheight=0.001)
+        label_date = tk.Label(FrameStatistics,text = '输入月份',font = 14)
+        label_date.place(relx = 0.05,rely = 0.1,relwidth = 0.2,relheight = 0.1)
+        self.entry_date = Entry(FrameStatistics,font = 14)
+        self.entry_date.place(relx = 0.25,rely = 0.1,relwidth = 0.2,relheight = 0.1)
+        btn_date = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 14,command = self.stastic_dateS)
+        btn_date.place(relx = 0.45,rely = 0.1,relwidth = 0.22,relheight = 0.1)
+        btn_dates = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 14,command = self.stastic_dateP)
+        btn_dates.place(relx = 0.67,rely = 0.1,relwidth = 0.28,relheight = 0.1)
+
+        label_date = Label(FrameStatistics,text = '按月统计',anchor = 'center',font = 14)
+        label_date.place(relx=0.0, rely=0.35, relwidth=1, relheight=0.1)
+        line_moth = Separator(FrameStatistics,style = 'TSeparator')
+        line_moth.place(relx=0.0, rely=0.43, relwidth=1, relheight=0.001)
+        label_moth = tk.Label(FrameStatistics,text = '输入年份',font = 14)
+        label_moth.place(relx = 0.05,rely = 0.45,relwidth = 0.2,relheight = 0.1)
+        self.entry_moth = Entry(FrameStatistics,font = 14)
+        self.entry_moth.place(relx = 0.25,rely = 0.45,relwidth = 0.2,relheight = 0.1)
+        btn_moth = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 14)
+        btn_moth.place(relx = 0.45,rely = 0.45,relwidth = 0.22,relheight = 0.1)
+        btn_moths = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 14)
+        btn_moths.place(relx = 0.67,rely = 0.45,relwidth = 0.28,relheight = 0.1)
+
+        label_date = Label(FrameStatistics,text = '按年统计',anchor = 'center',font = 14)
+        label_date.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.1)
+        line_year = Separator(FrameStatistics,style = 'TSeparator')
+        line_year.place(relx=0.0, rely=0.78, relwidth=1, relheight=0.001)
+        btn_year = tk.Button(FrameStatistics,text = '统计',relief = 'groove',font = 14)
+        btn_year.place(relx = 0.4,rely = 0.8,relwidth = 0.2,relheight = 0.1)
+        
     def Admin(self):
         '''
         管理员界面设计
@@ -533,6 +569,7 @@ class Application(Admin):
 
         Admin.__init__(self, master)
 
+    #主界面按钮对应的事件
     def b_book(self, event=None):
         '''书籍页面'''
         pass
@@ -582,6 +619,7 @@ class Application(Admin):
     def b_admin(self, event=None):
         '''管理员界面'''
         self.Admin()
+    #^主界面的按钮对应的功能^
 
     def SearchToDet(self):
         '''
@@ -634,6 +672,7 @@ class Application(Admin):
             comms.append(comm)
         return comms
 
+    # 管理员个人页面对应功能，检查输入信息的格式
     def event_editAdminInfo(self):
         '''
         编辑用户信息，将文本框设置为普通模式
@@ -689,7 +728,9 @@ class Application(Admin):
         if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", self.adminInfo[2]) == None:
             showerror('错误', 'Email格式错误')
             self.adminInfoFlag = False
+    # ^管理员个人页面对应功能，检查输入信息的格式^
 
+    #详情页对应功能，修改价格，库存，书籍下架，验证价格输入的格式
     def justfy_price(self):
         #修改价格时，价格格式的判断
         flag_price = True
@@ -776,7 +817,9 @@ class Application(Admin):
                 showerror('糟糕','下架失败')
         else:
             showinfo('提示','你取消了操作')
+    # ^详情页对应功能，修改价格，库存，书籍下架，验证价格输入的格式^
 
+    # 书籍上架页面对应功能，检查输入信息的格式,添加书籍
     def justfyBookInfo(self):
         '''检测上架书籍信息的格式'''
         flag_book = True
@@ -825,6 +868,106 @@ class Application(Admin):
                 showinfo('提示','上架成功')
             except:
                 showerror('糟糕','上架失败')
+    # ^书籍上架页面对应功能，检查输入信息的格式,添加书籍%^
+
+    #统计界面按钮对应的功能
+    def xy(self):
+        CountDate = [0 for i in range(31)]
+        PriceDate = [0.0 for i in range(31)]
+
+        cur.execute('select Odate,Ocount,price from orderinfo')
+        info = cur.fetchall()
+        date = [i[0].encode('utf-8').replace('-', '') for i in info]
+        for i in range(len(date)):
+            CountDate[int(date[i][-2:]) - 1] = info[i][1] + CountDate[int(date[i][-2:]) - 1]
+            PriceDate[int(date[i][-2:]) - 1] = info[i][2] + PriceDate[int(date[i][-2:]) - 1]
+        x = [i for i in range(1, 32)]
+        d = str(date[0][0:4]) + '-' + str(date[0][4:6])
+        return x, CountDate, PriceDate, d
+
+    def drawPlot(self,xData, yData,d):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # 柱状图
+
+        ax.bar(xData, yData, facecolor='#9999ff', edgecolor='white', align='center')
+
+        # 显示数字
+        for x, y in zip(xData, yData):
+            ax.text(x, y, y, ha='center', va='bottom')
+
+        xmajorLocator = MultipleLocator(1)  # 将x主刻度标签设置为1的倍数
+        ax.xaxis.set_major_locator(xmajorLocator)
+        # ax.yaxis.set_major_locator(xmajorLocator)
+        plt.xlim(0.5, 31.5)
+
+        # 设置坐标轴信息
+        plt.xtext = plt.xlabel(u'%s' % d)
+        plt.ytext = plt.ylabel(u'Sales')
+
+        # 出现网格
+        plt.grid(True)
+
+        plt.show()
+
+    def stastic_dateS(self):
+        #TODO 按日期统计
+        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
+            统计包括销量和销售额
+        '''
+        pass
+        reg = r'[0-9]{2}'
+        res = re.match(reg, str(self.entry_date.get().encode('utf-8')))
+        if res:
+            date_get = int(self.entry_date.get().encode('utf-8'))
+            if date_get <=12 and date_get>0:
+                date_get = self.entry_date.get().encode('utf-8')
+                cur.execute('select Odate,Ocount,price from orderinfo')
+                infos = cur.fetchall()
+                date = [i[0].encode('utf-8').replace('-', '') for i in infos]
+                info = []
+                for i in infos:
+                    if date_get in date[0][4:6]:
+                        info.append(i)
+                if info:
+                    x, yc, yp, d = self.xy()
+                    self.drawPlot(x,yc,d)
+                else:
+                    showinfo('提示','该月份无销售')
+            else:
+                showwarning('警告','输入正确的月份')
+        else:
+            showwarning('警告', '输入两位数的月份,如:01')
+
+    def stastic_dateP(self):
+        #TODO 按日期统计
+        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
+            统计包括销量和销售额
+        '''
+        pass
+        reg = r'[0-9]{2}'
+        res = re.match(reg, str(self.entry_date.get().encode('utf-8')))
+        if res:
+            date_get = int(self.entry_date.get().encode('utf-8'))
+            if date_get <=12 and date_get>0:
+                date_get = self.entry_date.get().encode('utf-8')
+                cur.execute('select Odate from orderinfo')
+                infos = cur.fetchall()
+                date = [i[0].encode('utf-8').replace('-', '') for i in infos]
+                info = []
+                for i in infos:
+                    if date_get in date[0][4:6]:
+                        info.append(i)
+                if info:
+                    x, yc, yp, d = self.xy()
+                    self.drawPlot(x,yp,d)
+                else:
+                    showinfo('提示','该月份无销售')
+            else:
+                showwarning('警告','输入正确的月份')
+        else:
+            showwarning('警告', '输入两位数的月份,如:01')
+
 
 windows_Admin = tk.Tk()
 Application(windows_Admin)

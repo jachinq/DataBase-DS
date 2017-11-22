@@ -10,6 +10,11 @@ from PIL import Image,ImageTk
 from tkinter.messagebox import *
 import re
 import time
+
+import matplotlib.pylab as plt
+import numpy as np
+from matplotlib.ticker import MultipleLocator
+
 import pymssql
 
 conn = pymssql.connect(host='localhost:1433', user='sa', password='ghostttt'
