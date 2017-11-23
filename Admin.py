@@ -368,9 +368,9 @@ class Admin(Frame):
         label_moth.place(relx = 0.05,rely = 0.45,relwidth = 0.2,relheight = 0.1)
         self.entry_moth = Entry(FrameStatistics,font = 14)
         self.entry_moth.place(relx = 0.25,rely = 0.45,relwidth = 0.2,relheight = 0.1)
-        btn_moth = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 14)
+        btn_moth = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 14,command = self.stastic_mothS)
         btn_moth.place(relx = 0.45,rely = 0.45,relwidth = 0.22,relheight = 0.1)
-        btn_moths = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 14)
+        btn_moths = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 14,command = self.stastic_mothP)
         btn_moths.place(relx = 0.67,rely = 0.45,relwidth = 0.28,relheight = 0.1)
 
         label_date = Label(FrameStatistics,text = '按年统计',anchor = 'center',font = 14)
@@ -911,7 +911,7 @@ class Application(Admin):
         plt.show()
 
     def stastic_dateS(self):
-        #TODO 按日期统计
+        #按日期统计
         '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
             统计包括销量和销售额
         '''
@@ -940,7 +940,7 @@ class Application(Admin):
             showwarning('警告', '输入两位数的月份,如:01')
 
     def stastic_dateP(self):
-        #TODO 按日期统计
+        #按日期统计
         '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
             统计包括销量和销售额
         '''
@@ -967,6 +967,103 @@ class Application(Admin):
                 showwarning('警告','输入正确的月份')
         else:
             showwarning('警告', '输入两位数的月份,如:01')
+
+    def mothxy(self):
+        CountDate = [0 for i in range(12)]
+        PriceDate = [0.0 for i in range(12)]
+
+        cur.execute('select Odate,Ocount,price from orderinfo')
+        info = cur.fetchall()
+        date = [i[0].encode('utf-8').replace('-', '') for i in info]
+        for i in range(len(date)):
+            CountDate[int(date[i][4:6]) - 1] = info[i][1] + CountDate[int(date[i][4:6]) - 1]
+            PriceDate[int(date[i][4:6]) - 1] = info[i][2] + PriceDate[int(date[i][4:6]) - 1]
+        x = [i for i in range(1, 13)]
+        d = str(date[0][0:4])
+        return x, CountDate, PriceDate, d
+
+    def drawMothPlot(self,xData, yData,d):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # 柱状图
+
+        ax.bar(xData, yData, facecolor='#9999ff', edgecolor='white', align='center')
+
+        # 显示数字
+        for x, y in zip(xData, yData):
+            ax.text(x, y, y, ha='center', va='bottom')
+
+        xmajorLocator = MultipleLocator(1)  # 将x主刻度标签设置为1的倍数
+        ax.xaxis.set_major_locator(xmajorLocator)
+        # ax.yaxis.set_major_locator(xmajorLocator)
+        plt.xlim(0.5, 12.5)
+
+        # 设置坐标轴信息
+        plt.xtext = plt.xlabel(u'%s' % d)
+        plt.ytext = plt.ylabel(u'Sales')
+
+        # 出现网格
+        plt.grid(True)
+
+        plt.show()
+
+    def stastic_mothS(self):
+        #按月份统计
+        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
+            统计包括销量和销售额
+        '''
+        pass
+        reg = r'[0-9]{4}'
+        res = re.match(reg, str(self.entry_moth.get().encode('utf-8')))
+        if res:
+            date_get = int(self.entry_moth.get().encode('utf-8'))
+            if date_get>0:
+                date_get = self.entry_date.get().encode('utf-8')
+                cur.execute('select Odate,Ocount,price from orderinfo')
+                infos = cur.fetchall()
+                date = [i[0].encode('utf-8').replace('-', '') for i in infos]
+                info = []
+                for i in infos:
+                    if date_get in date[0][4:6]:
+                        info.append(i)
+                if info:
+                    x, yc, yp, d = self.mothxy()
+                    self.drawMothPlot(x,yc,d)
+                else:
+                    showinfo('提示','该年无销售')
+            else:
+                showwarning('警告','输入正确的年份')
+        else:
+            showwarning('警告', '输入4位数的年份,如:2017')
+
+    def stastic_mothP(self):
+        #按日期统计
+        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
+            统计包括销量和销售额
+        '''
+        pass
+        reg = r'[0-9]{4}'
+        res = re.match(reg, str(self.entry_moth.get().encode('utf-8')))
+        if res:
+            date_get = int(self.entry_moth.get().encode('utf-8'))
+            if date_get>0:
+                date_get = self.entry_date.get().encode('utf-8')
+                cur.execute('select Odate from orderinfo')
+                infos = cur.fetchall()
+                date = [i[0].encode('utf-8').replace('-', '') for i in infos]
+                info = []
+                for i in infos:
+                    if date_get in date[0][4:6]:
+                        info.append(i)
+                if info:
+                    x, yc, yp, d = self.mothxy()
+                    self.drawMothPlot(x,yp,d)
+                else:
+                    showinfo('提示','该年无销售')
+            else:
+                showwarning('警告','输入正确的年份')
+        else:
+            showwarning('警告', '输入4位数的年份,如:2017')
 
 
 windows_Admin = tk.Tk()
