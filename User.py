@@ -182,8 +182,8 @@ class User(Frame):
         #图标
         P_det = tk.Canvas(self.FrameDet, bg='#FFFFFF')
         self.im_det = ImageTk.PhotoImage(Image.open(r'ico\det2.png'))
-        P_det.create_image(0.4, 8, anchor='nw', image=self.im_det)
-        P_det.place(relx=0.05, rely=-0.0, relwidth=0.16, relheight=0.18)
+        P_det.create_image(2.5, 8, anchor='nw', image=self.im_det)
+        P_det.place(relx=0.02, rely=-0.0, relwidth=0.16, relheight=0.18)
         comm = "exec pro_getBookDetInfo '%s'"%self.BookInfoISBN
         cur.execute(comm)
         self.BookDetInfo = cur.fetchall()

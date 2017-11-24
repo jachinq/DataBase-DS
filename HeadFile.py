@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter.ttk import *
 from PIL import Image,ImageTk
 from tkinter.messagebox import *
+import tkSimpleDialog as sd
 import re
 import time
 

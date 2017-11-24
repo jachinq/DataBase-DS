@@ -1,5 +1,9 @@
 #-*- coding:utf-8 -*-
-
+'''
+This is a scrpit for 登录，系统入口
+Author: Jachin
+Data: 2017- 11- 09
+'''
 from HeadFile import *
 
 class Login_ui(Frame):
@@ -49,7 +53,7 @@ class Login_ui(Frame):
         self.b_admin.place(relx=0.78, rely=0.26, relwidth=0.2, relheight=0.09)
 
     def create_Background(self):
-        self.image = Image.open("back.thumbnail")
+        self.image = Image.open(r"thu\back.thumbnail")
         self.im = ImageTk.PhotoImage(self.image)
         self.picture = tk.Canvas(self.master,bg = 'gray')
         self.picture.create_image(0,0,anchor = 'nw', image=self.im)
@@ -70,7 +74,7 @@ class Login_ui(Frame):
         
         self.textLoginUser = tk.StringVar(value='Amy')
         self.textLoginPswd = tk.StringVar(value='123')
-        self.entry_LoginUser = Entry(FrameUserLogin, textvariable=self.textLoginUser, font=('宋体', 14))
+        self.entry_LoginUser = Entry(FrameUserLogin, textvariable=self.textLoginUser, font=('Helvetica', 14))
         self.entry_LoginPswd = Entry(FrameUserLogin, textvariable=self.textLoginPswd, font=('宋体',14),show = '*')
         self.entry_LoginPswd.place(relx=0.32, rely=0.5, relwidth=0.6, relheight=0.16)
         self.entry_LoginUser.place(relx=0.32, rely=0.27, relwidth=0.6, relheight=0.16)
@@ -92,7 +96,7 @@ class Login_ui(Frame):
         #self.textRegisterUser = tk.StringVar(value='')
         #self.textRegisterPswd = tk.StringVar(value='')
         #self.textReRegisterPswd = tk.StringVar(value='')
-        self.entry_RegisterUser = Entry(FrameUserRegister,font=('宋体', 14))#,textvariable=self.textRegisterUser
+        self.entry_RegisterUser = Entry(FrameUserRegister,font=('Helvetica', 14))#,textvariable=self.textRegisterUser
         self.entry_RegisterPswd = Entry(FrameUserRegister, font=('宋体', 14), show ='*')#, textvariable=self.textRegisterPswd
         self.entry_ReRegisterPswd = Entry(FrameUserRegister, font=('宋体', 14),show = '*')#, textvariable=self.textReRegisterPswd
         self.entry_RegisterUser.place(relx=0.32, rely=0.1, relwidth=0.6, relheight=0.16)
@@ -117,7 +121,7 @@ class Login_ui(Frame):
 
         self.textAdminUser = tk.StringVar(value='')
         self.textAdminPswd = tk.StringVar(value='')
-        self.entry_AdminUser = Entry(FrameAdminLogin, textvariable=self.textAdminUser, font=('宋体', 14))
+        self.entry_AdminUser = Entry(FrameAdminLogin, textvariable=self.textAdminUser, font=('Helvetica', 14))
         self.entry_AdminPswd = Entry(FrameAdminLogin, textvariable=self.textAdminPswd, font=('宋体',14),show = '*')
         self.entry_AdminUser.place(relx=0.32, rely=0.27, relwidth=0.6, relheight=0.16)
         self.entry_AdminPswd.place(relx=0.32, rely=0.5, relwidth=0.6, relheight=0.16)
@@ -221,9 +225,23 @@ class Application(Login_ui):
             showwarning('提示','请使用字母和数字的组合')
 
     def b_login_admin(self):
-        #TODO 管理员登录
-        pass
-        print '管理员登陆'
+        '''管理员登录'''
+        comm = "select Auser,Apswd from administrator"
+        cur.execute(comm)
+        admin = cur.fetchall()
+        if self.entry_AdminUser.get() == str(admin[0][0].encode('utf-8')).strip():
+            if self.entry_AdminPswd.get() == admin[0][1]:
+                try:
+                    login_windows.destroy()
+                except:
+                    askretrycancel('糟糕','要重试吗?')
+                import Admin
+            #print '账号正确'
+            else:
+                showerror('Error','密码错误')
+        else:
+            showerror('Error','账号错误')
+
 
     def cancel_register(self):
         '''
