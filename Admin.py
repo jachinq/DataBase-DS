@@ -347,37 +347,37 @@ class Admin(Frame):
         FrameStatistics = tk.LabelFrame(self.FrameStatistics)
         FrameStatistics.place(relx=0.2, rely=0.08, relwidth=0.55, relheight=0.8)
 
-        label_date = Label(FrameStatistics,text = '按日统计',anchor = 'center',font = 14)
+        label_date = Label(FrameStatistics,text = '按日统计',anchor = 'center',font = 14,foreground = 'blue')
         label_date.place(relx=0.0, rely=0, relwidth=1, relheight=0.1)
         line_date = Separator(FrameStatistics,style = 'TSeparator')
         line_date.place(relx=0.0, rely=0.08, relwidth=1, relheight=0.001)
-        label_date = tk.Label(FrameStatistics,text = '输入月份',font = 14)
-        label_date.place(relx = 0.05,rely = 0.1,relwidth = 0.2,relheight = 0.1)
+        label_date = tk.Label(FrameStatistics,text = '输入月份',font = 10)
+        label_date.place(relx = 0.0,rely = 0.1,relwidth = 0.25,relheight = 0.1)
         self.entry_date = Entry(FrameStatistics,font = 14)
         self.entry_date.place(relx = 0.25,rely = 0.1,relwidth = 0.2,relheight = 0.1)
-        btn_date = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 14,command = self.stastic_dateS)
-        btn_date.place(relx = 0.45,rely = 0.1,relwidth = 0.22,relheight = 0.1)
-        btn_dates = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 14,command = self.stastic_dateP)
-        btn_dates.place(relx = 0.67,rely = 0.1,relwidth = 0.28,relheight = 0.1)
+        btn_date = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 10,command = self.stastic_dateS)
+        btn_date.place(relx = 0.45,rely = 0.1,relwidth = 0.25,relheight = 0.1)
+        btn_dates = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 10,command = self.stastic_dateP)
+        btn_dates.place(relx = 0.7,rely = 0.1,relwidth = 0.3,relheight = 0.1)
 
-        label_date = Label(FrameStatistics,text = '按月统计',anchor = 'center',font = 14)
+        label_date = Label(FrameStatistics,text = '按月统计',anchor = 'center',font = 14,foreground = 'blue')
         label_date.place(relx=0.0, rely=0.35, relwidth=1, relheight=0.1)
         line_moth = Separator(FrameStatistics,style = 'TSeparator')
         line_moth.place(relx=0.0, rely=0.43, relwidth=1, relheight=0.001)
-        label_moth = tk.Label(FrameStatistics,text = '输入年份',font = 14)
-        label_moth.place(relx = 0.05,rely = 0.45,relwidth = 0.2,relheight = 0.1)
+        label_moth = tk.Label(FrameStatistics,text = '输入年份',font = 10)
+        label_moth.place(relx = 0.0,rely = 0.45,relwidth = 0.25,relheight = 0.1)
         self.entry_moth = Entry(FrameStatistics,font = 14)
         self.entry_moth.place(relx = 0.25,rely = 0.45,relwidth = 0.2,relheight = 0.1)
-        btn_moth = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 14,command = self.stastic_mothS)
-        btn_moth.place(relx = 0.45,rely = 0.45,relwidth = 0.22,relheight = 0.1)
-        btn_moths = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 14,command = self.stastic_mothP)
-        btn_moths.place(relx = 0.67,rely = 0.45,relwidth = 0.28,relheight = 0.1)
+        btn_moth = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 10,command = self.stastic_mothS)
+        btn_moth.place(relx = 0.45,rely = 0.45,relwidth = 0.25,relheight = 0.1)
+        btn_moths = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 10,command = self.stastic_mothP)
+        btn_moths.place(relx = 0.7,rely = 0.45,relwidth = 0.3,relheight = 0.1)
 
-        label_date = Label(FrameStatistics,text = '按年统计',anchor = 'center',font = 14)
+        label_date = Label(FrameStatistics,text = '按年统计',anchor = 'center',font = 14,foreground = 'blue')
         label_date.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.1)
         line_year = Separator(FrameStatistics,style = 'TSeparator')
         line_year.place(relx=0.0, rely=0.78, relwidth=1, relheight=0.001)
-        btn_year = tk.Button(FrameStatistics,text = '统计',relief = 'groove',font = 14)
+        btn_year = tk.Button(FrameStatistics,text = '统计',relief = 'groove',font = 10)
         btn_year.place(relx = 0.4,rely = 0.8,relwidth = 0.2,relheight = 0.1)
         
     def Admin(self):
@@ -1018,13 +1018,13 @@ class Application(Admin):
         if res:
             date_get = int(self.entry_moth.get().encode('utf-8'))
             if date_get>0:
-                date_get = self.entry_date.get().encode('utf-8')
+                date_get = self.entry_moth.get().encode('utf-8')
                 cur.execute('select Odate,Ocount,price from orderinfo')
                 infos = cur.fetchall()
                 date = [i[0].encode('utf-8').replace('-', '') for i in infos]
                 info = []
                 for i in infos:
-                    if date_get in date[0][4:6]:
+                    if date_get in date[0][:4]:
                         info.append(i)
                 if info:
                     x, yc, yp, d = self.mothxy()
@@ -1047,13 +1047,13 @@ class Application(Admin):
         if res:
             date_get = int(self.entry_moth.get().encode('utf-8'))
             if date_get>0:
-                date_get = self.entry_date.get().encode('utf-8')
+                date_get = self.entry_moth.get().encode('utf-8')
                 cur.execute('select Odate from orderinfo')
                 infos = cur.fetchall()
                 date = [i[0].encode('utf-8').replace('-', '') for i in infos]
                 info = []
                 for i in infos:
-                    if date_get in date[0][4:6]:
+                    if date_get in date[0][:4]:
                         info.append(i)
                 if info:
                     x, yc, yp, d = self.mothxy()
