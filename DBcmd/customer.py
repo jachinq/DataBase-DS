@@ -2,7 +2,7 @@
 '''
 This is a scrpit for ...
 Author: Jachin
-Data: 2017- 11- 
+Data: 2017- 11- 12
 '''
 from __future__ import unicode_literals
 
@@ -23,7 +23,7 @@ def search():
         if item[1].encode('utf-8') == name:
             exsit = 1
             print 'ISBN：%s\n书名：\t%s\n作者：\t%s\n价格：\t%s\n出版社：\t%s\n库存：\t%s' \
-                  % (item[0], item[1], item[2], item[3], item[4], item[7])
+                  % (item[0], item[1], item[2], item[3], item[4], item[6])
             print '简介', item[5]
             print
     if not exsit:
@@ -37,7 +37,7 @@ def showshopping():
         for item, num in zip(shopping, range(len(shopping))):
             tab = ' %-2d\t%s\t%s %s\t\t%d\t\t%d'
             print '─' * 38
-            length = 20 - len(item[3])*2 + len(item[3])
+            length = 20 - len(item[3])
             print tab % (num, item[2].ljust(13), item[3].ljust(length), item[4], item[5], item[6])
         c_ques = raw_input('要下单吗(y/n)?')
         if c_ques == 'y' or c_ques == 'Y':
