@@ -257,7 +257,7 @@ class Admin(Frame):
 
 
 
-        self.libox_OrderInfo.place(relx=0.1, rely=0.08, relwidth=0.77, relheight=0.8)
+        self.libox_OrderInfo.place(relx=0.1, rely=0.08, relwidth=0.77, relheight=0.7)
         # 滚动条
         ysb = Scrollbar(self.FrameOrder, orient='vertical', command=self.libox_OrderInfo.yview)
         xsb = Scrollbar(self.FrameOrder, orient='horizontal', command=self.libox_OrderInfo.xview)
@@ -266,6 +266,9 @@ class Admin(Frame):
         xsb.config(command=self.libox_OrderInfo.xview)
         ysb.pack(side=tk.RIGHT, fill=tk.Y)
         xsb.pack(side=tk.BOTTOM, fill=tk.X)
+
+        order_check = tk.Button(self.FrameOrder,text = '查看详情',relief = 'groove',command = self.checkOrder)
+        order_check.place(relx = 0.4, rely = 0.8,relwidth = 0.2,relheight = 0.1)
 
     def Search(self):
         '''
@@ -377,8 +380,10 @@ class Admin(Frame):
         label_date.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.1)
         line_year = Separator(FrameStatistics,style = 'TSeparator')
         line_year.place(relx=0.0, rely=0.78, relwidth=1, relheight=0.001)
-        btn_year = tk.Button(FrameStatistics,text = '统计',relief = 'groove',font = 10)
-        btn_year.place(relx = 0.4,rely = 0.8,relwidth = 0.2,relheight = 0.1)
+        btn_year = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 10,command = self.stastic_yearS)
+        btn_year.place(relx = 0.35,rely = 0.8,relwidth = 0.25,relheight = 0.1)
+        btn_years = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 10,command = self.stastic_yearP)
+        btn_years.place(relx = 0.65,rely = 0.8,relwidth = 0.3,relheight = 0.1)
         
     def Admin(self):
         '''
@@ -549,7 +554,7 @@ class Admin(Frame):
         self.Text_listup[5].config(yscrollcommand=S.set)
 
 class Application(Admin):
-    #这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。
+    #这个类实现具体的事件处理回调函数。界面生成代码在Admin中。
     def __init__(self, master=None):
         self.style = Style()
         #设置列表的标题风格
@@ -588,8 +593,6 @@ class Application(Admin):
     def b_order(self, event=None):
         '''
         显示用户的订单
-        :param event: 
-        :return: 
         '''
         self.Order()
 
@@ -615,6 +618,21 @@ class Application(Admin):
 
         else:
             self.libox_OrderInfo.insert('', 'end', text=['你还没有下过订单'])
+
+    def checkOrder(self):
+        '''查看订单详情，可以查看收货人的相关信息'''
+        try:
+            list_box_orderID = self.libox_OrderInfo.item(self.libox_OrderInfo.focus(), "text")
+            comm = "select * from Orderdetail where oid = '%s'"%str(list_box_orderID)
+            cur.execute(comm)
+            info = cur.fetchall()
+            info = info[0]
+            s ="下单日期：%s\n姓名：%s\n住址：%s\n手机：%s\n邮编：%d"\
+               %(str(info[1].encode('utf-8')),str(info[2].encode('utf-8'))
+                 ,str(info[3].encode('utf-8')),str(info[4].encode('utf-8')),info[5])
+            showinfo("详情",s)    # 显示详情
+        except:
+            showwarning('提醒', '请选择要查看的订单')
 
     def b_admin(self, event=None):
         '''管理员界面'''
@@ -885,7 +903,7 @@ class Application(Admin):
         d = str(date[0][0:4]) + '-' + str(date[0][4:6])
         return x, CountDate, PriceDate, d
 
-    def drawPlot(self,xData, yData,d):
+    def drawDayPlot(self, xData, yData, d):
         fig = plt.figure()
         ax = fig.add_subplot(111)
         # 柱状图
@@ -911,7 +929,7 @@ class Application(Admin):
         plt.show()
 
     def stastic_dateS(self):
-        #按日期统计
+        #按日期统计销量
         '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
             统计包括销量和销售额
         '''
@@ -931,7 +949,7 @@ class Application(Admin):
                         info.append(i)
                 if info:
                     x, yc, yp, d = self.xy()
-                    self.drawPlot(x,yc,d)
+                    self.drawDayPlot(x, yc, d)
                 else:
                     showinfo('提示','该月份无销售')
             else:
@@ -940,7 +958,7 @@ class Application(Admin):
             showwarning('警告', '输入两位数的月份,如:01')
 
     def stastic_dateP(self):
-        #按日期统计
+        #按日期统计销售额
         '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
             统计包括销量和销售额
         '''
@@ -960,7 +978,7 @@ class Application(Admin):
                         info.append(i)
                 if info:
                     x, yc, yp, d = self.xy()
-                    self.drawPlot(x,yp,d)
+                    self.drawDayPlot(x, yp, d)
                 else:
                     showinfo('提示','该月份无销售')
             else:
@@ -1008,7 +1026,7 @@ class Application(Admin):
         plt.show()
 
     def stastic_mothS(self):
-        #按月份统计
+        #按月份统计销量
         '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
             统计包括销量和销售额
         '''
@@ -1037,7 +1055,7 @@ class Application(Admin):
             showwarning('警告', '输入4位数的年份,如:2017')
 
     def stastic_mothP(self):
-        #按日期统计
+        #按月份统计销售额
         '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
             统计包括销量和销售额
         '''
@@ -1064,6 +1082,92 @@ class Application(Admin):
                 showwarning('警告','输入正确的年份')
         else:
             showwarning('警告', '输入4位数的年份,如:2017')
+
+    #年
+    def yearxy(self):
+        CountDate = [0 for i in range(12)]
+        PriceDate = [0.0 for i in range(12)]
+
+        cur.execute('select Odate,Ocount,price from orderinfo')
+        info = cur.fetchall()
+        date = [i[0].encode('utf-8').replace('-', '') for i in info]
+        print date
+        for i in range(len(date)):
+            CountDate[int(date[i][:4]) - 1] = info[i][1] + CountDate[int(date[i][:4]) - 1]
+            PriceDate[int(date[i][:4]) - 1] = info[i][2] + PriceDate[int(date[i][:4]) - 1]
+        x = [i for i in range(1, 13)]
+        d = str(date[0][0:4])
+        return x, CountDate, PriceDate, d
+
+    def drawYearPlot(self,xData, yData,d):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # 柱状图
+
+        ax.bar(xData, yData, facecolor='#9999ff', edgecolor='white', align='center')
+
+        # 显示数字
+        for x, y in zip(xData, yData):
+            ax.text(x, y, y, ha='center', va='bottom')
+
+        xmajorLocator = MultipleLocator(1)  # 将x主刻度标签设置为1的倍数
+        ax.xaxis.set_major_locator(xmajorLocator)
+        # ax.yaxis.set_major_locator(xmajorLocator)
+        plt.xlim(0.5, 11.5)
+
+        # 设置坐标轴信息
+        plt.xtext = plt.xlabel(u'%s' % d)
+        plt.ytext = plt.ylabel(u'Sales')
+
+        # 出现网格
+        plt.grid(True)
+
+        plt.show()
+
+    def stastic_yearS(self):
+        #按年统计销量
+        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
+            统计包括销量和销售额
+        '''
+        pass
+        reg = r'[0-9]{4}'
+        res = re.match(reg, str(self.entry_moth.get().encode('utf-8')))
+        if res:
+            date_get = int(self.entry_moth.get().encode('utf-8'))
+            if date_get>0:
+                date_get = self.entry_moth.get().encode('utf-8')
+                cur.execute('select Odate,Ocount,price from orderinfo')
+                infos = cur.fetchall()
+                date = [i[0].encode('utf-8').replace('-', '') for i in infos]
+                info = []
+                for i in infos:
+                    if date_get in date[0][:4]:
+                        info.append(i)
+                if info:
+                    x, yc, yp, d = self.mothxy()
+                    self.drawMothPlot(x,yc,d)
+                else:
+                    showinfo('提示','该年无销售')
+            else:
+                showwarning('警告','输入正确的年份')
+        else:
+            showwarning('警告', '输入4位数的年份,如:2017')
+
+    def stastic_yearP(self):
+        #按年统计销售额
+        date_get = self.entry_moth.get().encode('utf-8')
+        cur.execute('select Odate from orderinfo')
+        infos = cur.fetchall()
+        date = [i[0].encode('utf-8').replace('-', '') for i in infos]
+        info = []
+        for i in infos:
+            if date_get in date[0][:4]:
+                info.append(i)
+        if info:
+            x, yc, yp, d = self.yearxy()
+            self.drawYearPlot(x,yp,d)
+        else:
+            showinfo('提示','十年无销售')
 
 
 windows_Admin = tk.Tk()
