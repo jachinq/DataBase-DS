@@ -381,9 +381,9 @@ class Admin(Frame):
         line_year = Separator(FrameStatistics,style = 'TSeparator')
         line_year.place(relx=0.0, rely=0.78, relwidth=1, relheight=0.001)
         btn_year = tk.Button(FrameStatistics,text = '统计销量',relief = 'groove',font = 10,command = self.stastic_yearS)
-        btn_year.place(relx = 0.35,rely = 0.8,relwidth = 0.25,relheight = 0.1)
+        btn_year.place(relx = 0.2,rely = 0.8,relwidth = 0.25,relheight = 0.1)
         btn_years = tk.Button(FrameStatistics,text = '统计销售额',relief = 'groove',font = 10,command = self.stastic_yearP)
-        btn_years.place(relx = 0.65,rely = 0.8,relwidth = 0.3,relheight = 0.1)
+        btn_years.place(relx = 0.5,rely = 0.8,relwidth = 0.3,relheight = 0.1)
         
     def Admin(self):
         '''
@@ -893,7 +893,7 @@ class Application(Admin):
         CountDate = [0 for i in range(31)]
         PriceDate = [0.0 for i in range(31)]
 
-        cur.execute('select Odate,Ocount,price from orderinfo')
+        cur.execute('select * from StaticInfo')
         info = cur.fetchall()
         date = [i[0].encode('utf-8').replace('-', '') for i in info]
         for i in range(len(date)):
@@ -989,8 +989,7 @@ class Application(Admin):
     def mothxy(self):
         CountDate = [0 for i in range(12)]
         PriceDate = [0.0 for i in range(12)]
-
-        cur.execute('select Odate,Ocount,price from orderinfo')
+        cur.execute('select * from StaticInfo')
         info = cur.fetchall()
         date = [i[0].encode('utf-8').replace('-', '') for i in info]
         for i in range(len(date)):
@@ -1027,10 +1026,6 @@ class Application(Admin):
 
     def stastic_mothS(self):
         #按月份统计销量
-        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
-            统计包括销量和销售额
-        '''
-        pass
         reg = r'[0-9]{4}'
         res = re.match(reg, str(self.entry_moth.get().encode('utf-8')))
         if res:
@@ -1056,10 +1051,6 @@ class Application(Admin):
 
     def stastic_mothP(self):
         #按月份统计销售额
-        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
-            统计包括销量和销售额
-        '''
-        pass
         reg = r'[0-9]{4}'
         res = re.match(reg, str(self.entry_moth.get().encode('utf-8')))
         if res:
@@ -1085,18 +1076,19 @@ class Application(Admin):
 
     #年
     def yearxy(self):
-        CountDate = [0 for i in range(12)]
-        PriceDate = [0.0 for i in range(12)]
 
-        cur.execute('select Odate,Ocount,price from orderinfo')
+        CountDate = [0 for i in range(10)]
+        PriceDate = [0.0 for i in range(10)]
+
+        cur.execute('select * from StaticInfo')
         info = cur.fetchall()
         date = [i[0].encode('utf-8').replace('-', '') for i in info]
-        print date
+        x = [i for i in range(int(date[-1][:4])-9, int(date[-1][:4])+1)]
         for i in range(len(date)):
-            CountDate[int(date[i][:4]) - 1] = info[i][1] + CountDate[int(date[i][:4]) - 1]
-            PriceDate[int(date[i][:4]) - 1] = info[i][2] + PriceDate[int(date[i][:4]) - 1]
-        x = [i for i in range(1, 13)]
-        d = str(date[0][0:4])
+            CountDate[x.index(int(info[i][0][:4]))] += info[i][1]
+            PriceDate[x.index(int(info[i][0][:4]))] += info[i][2]
+
+        d = str(int(date[-1][:4])-9)
         return x, CountDate, PriceDate, d
 
     def drawYearPlot(self,xData, yData,d):
@@ -1113,10 +1105,10 @@ class Application(Admin):
         xmajorLocator = MultipleLocator(1)  # 将x主刻度标签设置为1的倍数
         ax.xaxis.set_major_locator(xmajorLocator)
         # ax.yaxis.set_major_locator(xmajorLocator)
-        plt.xlim(0.5, 11.5)
+        plt.xlim(int(d)-0.5, int(d)+9.5)
 
         # 设置坐标轴信息
-        plt.xtext = plt.xlabel(u'%s' % d)
+        plt.xtext = plt.xlabel(u'%s To Now' % d)
         plt.ytext = plt.ylabel(u'Sales')
 
         # 出现网格
@@ -1126,47 +1118,18 @@ class Application(Admin):
 
     def stastic_yearS(self):
         #按年统计销量
-        '''先获取要统计哪一月的情况 如果数据库没有信息的或，提示，否则显示统计结果。
-            统计包括销量和销售额
-        '''
-        pass
-        reg = r'[0-9]{4}'
-        res = re.match(reg, str(self.entry_moth.get().encode('utf-8')))
-        if res:
-            date_get = int(self.entry_moth.get().encode('utf-8'))
-            if date_get>0:
-                date_get = self.entry_moth.get().encode('utf-8')
-                cur.execute('select Odate,Ocount,price from orderinfo')
-                infos = cur.fetchall()
-                date = [i[0].encode('utf-8').replace('-', '') for i in infos]
-                info = []
-                for i in infos:
-                    if date_get in date[0][:4]:
-                        info.append(i)
-                if info:
-                    x, yc, yp, d = self.mothxy()
-                    self.drawMothPlot(x,yc,d)
-                else:
-                    showinfo('提示','该年无销售')
-            else:
-                showwarning('警告','输入正确的年份')
-        else:
-            showwarning('警告', '输入4位数的年份,如:2017')
+        try:
+            x, yc, yp, d = self.yearxy()
+            self.drawYearPlot(x,yc,d)
+        except:
+            showinfo('提示','十年无销售')
 
     def stastic_yearP(self):
         #按年统计销售额
-        date_get = self.entry_moth.get().encode('utf-8')
-        cur.execute('select Odate from orderinfo')
-        infos = cur.fetchall()
-        date = [i[0].encode('utf-8').replace('-', '') for i in infos]
-        info = []
-        for i in infos:
-            if date_get in date[0][:4]:
-                info.append(i)
-        if info:
+        try:
             x, yc, yp, d = self.yearxy()
             self.drawYearPlot(x,yp,d)
-        else:
+        except:
             showinfo('提示','十年无销售')
 
 
