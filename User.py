@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 '''
-This is a scrpit for 用户
+用户功能模块
+1.浏览图书
+    用户可以浏览图书，而且查看图书的详细信息
+2.查询图书
+    用户可以通过书名或作者来进行模糊搜索，可以从结果查看书籍的详细信息
+3.购物车功能
+    用户在书籍详情页，可以将该书籍添加到购物车，默认一次添加一本
+    可以在购物车界面进行数量的修改，确认无误后，进行下单，下单将会清空购物车
+4.订单查看
+    用户在购物车成功下单后，就会出现相应的订单，可以查看订单的详细信息
+5.个人信息
+    用户可以在个人信息界面查看自己的个人信息，同时也可以修改信息
+    用户可以在个人信息界面修改自己的账号和密码
 Author: Jachin
 Data: 2017- 11- 11
 '''
@@ -9,7 +21,6 @@ from HeadFile import *
 class User(Frame):
     def __init__(self,top = None):
         Frame.__init__(self,top)
-        #top = tk.Tk()
         top.title('User')
         top.geometry("740x458+330+150")
         top.resizable(0,0)
@@ -18,9 +29,7 @@ class User(Frame):
 
     def Main(self,top):
         '''
-        程序主界面？反正有负责整个软件的五大功能的组成
-        :param top: 
-        :return: 
+        程序主界面，负责整个系统的五大功能的组成
         '''
         #五个图标
         self.ico_book = ImageTk.PhotoImage(Image.open(r'ico\book.png'))
@@ -503,7 +512,6 @@ class User(Frame):
         def reNum():
             '''
             确认修改数量，自动修改相应的总价
-            :return: 
             '''
             cur.execute('select ISBN,Bname from book')
             self.BookInfo = cur.fetchall()
@@ -519,8 +527,7 @@ class User(Frame):
                 if entry_shopNum.get().isdigit(): #判断输入是否为数字
                     num =  int(entry_shopNum.get())  #获取已有书本数
                     #TODO 联系触发器
-                    price =  float(list_bookPrice)/int(list_bookNum)*num #获取书籍单价再乘以数量得到总价
-                    cur.execute('update shopping set Ocount = %d,price = %.2f where Cid = %d and ISBN = %s'%(num,price,self.Cid,list_bookName))
+                    cur.execute('update shopping set Ocount = %d where Cid = %d and ISBN = %s'%(num,self.Cid,list_bookName))
                     conn.commit()
                     FrameEditShopO.destroy()
                     showinfo('提示','修改成功')
@@ -844,8 +851,6 @@ class Application(User):
         if '' == self.userValues[6]:
             showerror('错误', '地址不能为空')
             self.userInfoFlag = False
-
-
 
 top = tk.Tk()
 Application(top)
