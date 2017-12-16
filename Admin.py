@@ -752,7 +752,7 @@ class Application(Admin):
     def justfy_price(self):
         #修改价格时，价格格式的判断
         flag_price = True
-        reg = r'[0-9]{1,}.[0-9]{2}元'
+        reg = r'[0-9]{1,}.[0-9]{2}'
         res = re.match(reg, str(self.Text_list[4].get().encode('utf-8')))
         if not res:
             showerror('错误', '价格格式错误')
@@ -764,14 +764,14 @@ class Application(Admin):
         #定义事件
         #点击确认修改后，验证数据格式，提交到数据库，控件模式改变
         def modifyp():
-            #step 1 验证数据正确性，价格不能<0.格式为 __.__元
+            #step 1 验证数据正确性，价格不能<0.格式为 __.__
             if self.justfy_price():
-                #命令。更新书籍表的价格，记住，这里的书籍价格格式是__.__元
+                #命令。更新书籍表的价格，记住，这里的书籍价格格式是__.__
                 comm_updatebook = "update book set Bprice = '%s' where ISBN = '%s'"%(str(self.Text_list[4].get().encode('utf-8'))
                                 ,str(self.Text_list[3].get().encode('utf-8')))
                 ISBN = str(self.Text_list[3].get().encode('utf-8'))
                 #执行书籍表价格的更新命令。未提交
-                #cur.execute(comm_updatebook)
+                cur.execute(comm_updatebook)
                 #如果购物车中有要修改价格的书，则获取购物车中的书籍数量，返回的是一个列表
                 comm_selectshop = "select distinct Ocount from shopping where ISBN = '%s'"%(str(self.Text_list[3].get().encode('utf-8')))
                 cur.execute(comm_selectshop)
