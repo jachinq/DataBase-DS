@@ -518,7 +518,8 @@ class User(Frame):
             if entry_shopNum.get()!='':  #判断输入数量是否不空
                 if entry_shopNum.get().isdigit(): #判断输入是否为数字
                     num =  int(entry_shopNum.get())  #获取已有书本数
-                    price =  float(list_bookPrice)/int(list_bookNum)*num #获取书籍单价
+                    #TODO 联系触发器
+                    price =  float(list_bookPrice)/int(list_bookNum)*num #获取书籍单价再乘以数量得到总价
                     cur.execute('update shopping set Ocount = %d,price = %.2f where Cid = %d and ISBN = %s'%(num,price,self.Cid,list_bookName))
                     conn.commit()
                     FrameEditShopO.destroy()
@@ -706,8 +707,8 @@ class Application(User):
             cur.execute("select Bname from book where ISBN = '%s'"%(i[0].encode('utf-8')))
             Bname = cur.fetchall()
             Bname = Bname[0][0]
-            comm = "insert into orderinfo values('%s',%d,%d,'%s','%s','%s',%d,%.2f)"%(Oid,self.Cid,Rid,date,Bname
-                                                                        ,str(i[0].encode('utf-8')),int(i[1]),float(i[2]))
+            comm = "insert into orderinfo values('%s',%d,%d,'%s','%s','%s',%d,%.2f)"\
+                   %(Oid,self.Cid,Rid,date,Bname,str(i[0].encode('utf-8')),int(i[1]),float(i[2]))
             comm = comm.encode('utf-8')
             comms.append(comm)
         return comms
@@ -750,7 +751,7 @@ class Application(User):
                         cur.execute(comm)
                         Rid = cur.fetchall()
                         for i in self.generate_orderInfo(Rid[0][0]):
-                            cur.execute(i)      #插入订单表，这里没有判断库存的问题
+                            cur.execute(i)      #插入订单表
                     else:
                         #如果当前用户信息不在收货人列表，则生成新的收货人
                         cur.execute("select * from Receve")
