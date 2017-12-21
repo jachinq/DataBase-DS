@@ -216,7 +216,7 @@ class Application(Login_ui):
             if flag:#如果用户名不存在，则判断两次密码是否一致
                 if str(pswd.encode('utf-8')).isalnum():#检查输入格式
                     if pswd == repswd:
-                        self.register_userInfo()
+                        self.register_userInfo()#密码一致，打开注册界面
                     else:
                         showwarning('提示','两次输入密码不一致')
                 else:
@@ -259,32 +259,41 @@ class Application(Login_ui):
         :return: 
         '''
         self.userInfoFlag = True#所有信息都正确的标志
-
+        error_id= [0 for _ in xrange(6)]
+        error_info = ['姓名格式错误','邮编格式错误','性别只能为\'男\'或\'女\'',
+                      'Email格式错误','手机号格式错误', '地址不能为空']
         if len(self.entry_name.get())<2:
-            showerror('错误', '姓名格式错误')
+            error_id[0] = 1
             self.userInfoFlag = False
 
         if not self.entry_post.get().isdigit() or len(self.entry_post.get()) != 6:
-            showerror('错误', '邮编格式错误')
+            error_id[1] = 1
             self.userInfoFlag = False
 
         if self.entry_sex.get() not in [u'男',u'女']:
-            showerror('错误', '性别只能为\'男\'或\'女\'')
+            error_id[2] = 1
             self.userInfoFlag = False
 
 
         reg = "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$"
         if re.match(reg, self.entry_email.get()) == None:
-            showerror('错误', 'Email格式错误')
+            error_id[3] = 1
             self.userInfoFlag = False
 
         if not self.entry_num.get().isdigit() or len(self.entry_num.get()) != 11:
-            showerror('错误', '手机号格式错误')
+            error_id[4] = 1
             self.userInfoFlag = False
 
         if '' == self.entry_address.get():
-            showerror('错误', '地址不能为空')
+            error_id[5] = 1
             self.userInfoFlag = False
+
+        if not self.userInfoFlag:
+            s = ""
+            for i in range(len(error_id)):
+                if error_id[i]:
+                    s += "%s\n"%error_info[i]
+            showerror('错误',s)
 
     def event_reRegister(self):
         '''
@@ -293,11 +302,15 @@ class Application(Login_ui):
         '''
         self.justy_userInfo()
         if self.userInfoFlag:
-            s =  (self.entry_RegisterUser.get(),self.entry_RegisterPswd.get()
-                    ,str(self.entry_name.get().encode('utf-8')),str(self.entry_sex.get().encode('utf-8'))
-                   ,self.entry_num.get(),self.entry_email.get(),str(self.entry_address.get().encode('utf-8'))
+            s =  (self.entry_RegisterUser.get()
+                    ,self.entry_RegisterPswd.get()
+                    ,str(self.entry_name.get().encode('utf-8'))
+                    ,str(self.entry_sex.get().encode('utf-8'))
+                    ,self.entry_num.get(),self.entry_email.get()
+                    ,str(self.entry_address.get().encode('utf-8'))
                    ,int(self.entry_post.get()))
-            comm = "insert into customer values ('%s','%s','%s','%s','%s','%s','%s',%d)"%(s[0],s[1],s[2],s[3],s[4],s[5],s[6],s[7])
+            comm = "insert into customer values ('%s','%s','%s','%s','%s','%s','%s',%d)"%(
+                s[0],s[1],s[2],s[3],s[4],s[5],s[6],s[7])
             cur.execute(comm)
             conn.commit()
             showinfo('提示','注册成功')
