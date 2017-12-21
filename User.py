@@ -824,33 +824,43 @@ class Application(User):
         :return: 
         '''
         self.userInfoFlag = True
+        error_id= [0 for _ in xrange(7)]
+        error_info = ['账号只能由字母和数字组成','性别只能为\'男\'或\'女\'', '姓名不能为空','邮编格式错误',
+                      'Email格式错误','手机号格式错误', '地址不能为空']
         if not self.userValues[0].isalnum():
-            showerror('错误', '账号只能由字母和数字组成')
+            error_id[0] = 1
             self.userInfoFlag = False
 
         if self.userValues[1] not in [u'男',u'女']:
-            showerror('错误', '性别只能为\'男\'或\'女\'')
+            error_id[1] = 1
             self.userInfoFlag = False
 
         if '' == self.userValues[2]:
-            showerror('错误', '姓名不能为空')
+            error_id[2] = 1
             self.userInfoFlag = False
 
         if not self.userValues[3].isdigit() or len(self.userValues[3]) != 6:
-            showerror('错误', '邮编格式错误')
+            error_id[3] = 1
             self.userInfoFlag = False
 
         if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", self.userValues[4]) == None:
-            showerror('错误', 'Email格式错误')
+            error_id[4] = 1
             self.userInfoFlag = False
 
         if not self.userValues[5].isdigit() or len(self.userValues[5]) != 11:
-            showerror('错误', '手机号格式错误')
+            error_id[5] = 1
             self.userInfoFlag = False
 
         if '' == self.userValues[6]:
-            showerror('错误', '地址不能为空')
+            error_id[6] = 1
             self.userInfoFlag = False
+
+        if not self.userInfoFlag:
+            s = ""
+            for i in range(len(error_id)):
+                if error_id[i]:
+                    s += "%s\n"%error_info[i]
+            showerror('错误',s)
 
 top = tk.Tk()
 Application(top)
