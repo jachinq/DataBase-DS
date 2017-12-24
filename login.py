@@ -4,6 +4,7 @@ This is a scrpit for 登录，系统入口
 Author: Jachin
 Data: 2017- 11- 09
 '''
+
 from HeadFile import *
 
 class Login_ui(Frame):
