@@ -192,7 +192,7 @@ class Application(Login_ui):
                 try:
                     login_windows.destroy()
                 except:
-                    askretrycancel('糟糕','要重试吗?')
+                    askretrycancel('登陆失败','要重试吗?')
                 setCid(i[2])
                 import User
         if Flag:
